@@ -8,10 +8,7 @@ import com.cdut.pojo.Result;
 import com.cdut.service.ProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,17 +31,17 @@ public class ProfileController {
 
 
     @PutMapping("/profile")
-    public Result<Void> modifyElderProfile(ElderProfileUpdateDTO elderProfileUpdateDTO) {
+    public Result<Void> modifyElderProfile(@RequestBody ElderProfileUpdateDTO elderProfileUpdateDTO) {
         return profileService.updateElderProfile(elderProfileUpdateDTO);
     }
 
     @GetMapping("/profile/health-records")
-    public Result<List<HealthRecord>> getHealthRecords(Integer elderId) {
+    public Result<List<HealthRecord>> getHealthRecords(@RequestParam Integer elderId) {
         return profileService.getHealthRecords(elderId);
     }
 
     @GetMapping("/profile/family-contacts")
-    public Result<List<FamilyContact>> getFamilyContacts(Integer elderId) {
+    public Result<List<FamilyContact>> getFamilyContacts(@RequestParam Integer elderId) {
         return profileService.getFamilyContacts(elderId);
     }
 }

@@ -87,6 +87,12 @@
             <version>0.12.5</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- PageHelper 分页插件核心库（Spring Boot 4 手动注册拦截器） -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>6.1.1</version>
+        </dependency>
 
     </dependencies>
 
