@@ -12,13 +12,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class ElderProfileQueryDTO extends ElderProfile {
 
-   // 页码，默认1 /
 
-   private Integer pageNum = 1;
-
-   // 每页条数，默认10 /
-
-   private Integer pageSize = 10;
 
    // 标签ID（重点人群筛选） /
 

@@ -33,4 +33,7 @@ public class PageResult<T> implements Serializable {
        int pages = pageSize > 0 ? (int) ((total + pageSize - 1) / pageSize) : 0;
        return new PageResult<>(total, pages, pageNum, pageSize, list);
    }
+   public static <T> PageResult<T> of(List<T> list, long total) {
+       return new PageResult<>(total, (int) ((total + 10 - 1) / 10), 1, 10, list);
+   }
 }

@@ -1,11 +1,12 @@
 package com.cdut.controller;
 
+import com.cdut.dto.DeviceQueryDTO;
 import com.cdut.dto.ElderProfileDetailDTO;
+import com.cdut.dto.ElderProfileQueryDTO;
 import com.cdut.dto.ElderProfileUpdateDTO;
-import com.cdut.pojo.FamilyContact;
-import com.cdut.pojo.HealthRecord;
-import com.cdut.pojo.Result;
+import com.cdut.pojo.*;
 import com.cdut.service.ProfileService;
+import com.github.pagehelper.PageInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,14 @@ public class ProfileController {
             return Result.error("用户信息获取失败");
         }
         return profileService.getElderProfile(Integer.valueOf(userId));
+    }
+    @GetMapping("/profile/page")
+    public PageResult<ElderProfileQueryDTO> list(@RequestParam(defaultValue = "1") int pageNum,
+                                                 @RequestParam(defaultValue = "10") int pageSize,
+                                                 @RequestParam(required = false) Integer elderId) {
+        PageInfo<ElderProfileQueryDTO> pageInfo = profileService.listByPage(pageNum, pageSize, elderId);
+
+        return PageResult.of(pageInfo.getList(), pageInfo.getTotal());
     }
 
 
