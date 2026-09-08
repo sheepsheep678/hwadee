@@ -13,24 +13,25 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private LoginInterceptor loginInterceptor;
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(loginInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/api/doctor/auth/login", "/api/elder/auth/login");
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/api/**")
+                // 各端登录注册接口放行（新端接入时在这里加）
+                .excludePathPatterns(
+                        "/api/auth/**",
+                        "/api/admin/auth/**",
+                        "/api/doctor/auth/**",
+                        "/api/elder/auth/**"
+                );
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        //添加映射路径
         registry.addMapping("/**")
-                // 允许跨域的域名或IP，星号代表允许所有
                 .allowedOrigins("*")
-                // 请求允许的方法，如：GET, POST, PUT, DELETE等
                 .allowedMethods("*")
-                // 预检间隔时间
                 .maxAge(168000)
-                // 允许头部设置
                 .allowedHeaders("*");
     }
 }
