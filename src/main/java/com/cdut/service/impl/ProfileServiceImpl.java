@@ -1,6 +1,7 @@
 package com.cdut.service.impl;
 
 import com.cdut.dto.ElderProfileDetailDTO;
+import com.cdut.dto.ElderProfileUpdateDTO;
 import com.cdut.mapper.FamilyMapper;
 import com.cdut.mapper.HealthMapper;
 import com.cdut.mapper.ProfileMapper;
@@ -18,6 +19,8 @@ import java.util.List;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
+
+
     @Autowired
     private ProfileMapper profileMapper;
     @Autowired
@@ -44,5 +47,23 @@ public class ProfileServiceImpl implements ProfileService {
         elderProfileDetailDTO.setTags(tags);
 
         return Result.success(elderProfileDetailDTO);
+    }
+
+    @Override
+    public Result<Void> updateElderProfile(ElderProfileUpdateDTO elderProfileUpdateDTO) {
+        profileMapper.updateElderProfile(elderProfileUpdateDTO);
+        return Result.success("更新成功");
+    }
+
+    @Override
+    public Result<List<HealthRecord>> getHealthRecords(Integer elderId) {
+        List<HealthRecord> healthRecords = healthMapper.selectHealthRecordById(elderId);
+        return Result.success(healthRecords);
+    }
+
+    @Override
+    public Result<List<FamilyContact>> getFamilyContacts(Integer elderId) {
+        List<FamilyContact> familyContacts = familyMapper.selectFamilyContactById(elderId);
+        return Result.success(familyContacts);
     }
 }

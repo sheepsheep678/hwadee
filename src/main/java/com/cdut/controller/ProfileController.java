@@ -1,13 +1,19 @@
 package com.cdut.controller;
 
 import com.cdut.dto.ElderProfileDetailDTO;
+import com.cdut.dto.ElderProfileUpdateDTO;
+import com.cdut.pojo.FamilyContact;
+import com.cdut.pojo.HealthRecord;
 import com.cdut.pojo.Result;
 import com.cdut.service.ProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/elder")
@@ -23,6 +29,22 @@ public class ProfileController {
         if (userId == null) {
             return Result.error("用户信息获取失败");
         }
-        return profileService.getElderProfile(Integer.valueOf(1));
+        return profileService.getElderProfile(Integer.valueOf(userId));
+    }
+
+
+    @PutMapping("/profile")
+    public Result<Void> modifyElderProfile(ElderProfileUpdateDTO elderProfileUpdateDTO) {
+        return profileService.updateElderProfile(elderProfileUpdateDTO);
+    }
+
+    @GetMapping("/profile/health-records")
+    public Result<List<HealthRecord>> getHealthRecords(Integer elderId) {
+        return profileService.getHealthRecords(elderId);
+    }
+
+    @GetMapping("/profile/family-contacts")
+    public Result<List<FamilyContact>> getFamilyContacts(Integer elderId) {
+        return profileService.getFamilyContacts(elderId);
     }
 }
