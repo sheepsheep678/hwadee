@@ -45,6 +45,6 @@ public class PageResult<T> implements Serializable {
      * 空分页
      */
     public static <T> PageResult<T> empty(int pageNum, int pageSize) {
-        return new PageResult<>(0, 0, pageNum, pageSize, Collections.emptyList());
+        return new PageResult<>(0L, 0, pageNum, pageSize, Collections.emptyList());
     }
 }

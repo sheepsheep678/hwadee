@@ -27,7 +27,7 @@ public class ProfileController {
         if (userId == null) {
             return Result.error("用户信息获取失败");
         }
-        return profileService.getElderProfile(Integer.valueOf(userId));
+        return profileService.getElderProfile(Long.valueOf(userId));
     }
     @GetMapping("/profile/page")
     public PageResult<ElderProfileQueryDTO> list(@RequestParam(defaultValue = "1") int pageNum,
@@ -35,7 +35,7 @@ public class ProfileController {
                                                  @RequestParam(required = false) Integer elderId) {
         PageInfo<ElderProfileQueryDTO> pageInfo = profileService.listByPage(pageNum, pageSize, elderId);
 
-        return PageResult.of(pageInfo.getList(), pageInfo.getTotal());
+        return PageResult.of(pageInfo.getList(), pageInfo.getTotal(),pageNum, pageSize);
     }
 
 
@@ -45,12 +45,12 @@ public class ProfileController {
     }
 
     @GetMapping("/profile/health-records")
-    public Result<List<HealthRecord>> getHealthRecords(@RequestParam Integer elderId) {
+    public Result<List<HealthRecord>> getHealthRecords(@RequestParam Long elderId) {
         return profileService.getHealthRecords(elderId);
     }
 
     @GetMapping("/profile/family-contacts")
-    public Result<List<FamilyContact>> getFamilyContacts(@RequestParam Integer elderId) {
+    public Result<List<FamilyContact>> getFamilyContacts(@RequestParam Long elderId) {
         return profileService.getFamilyContacts(elderId);
     }
 }

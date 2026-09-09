@@ -67,13 +67,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Result<List<HealthRecord>> getHealthRecords(Integer elderId) {
+    public Result<List<HealthRecord>> getHealthRecords(Long elderId) {
         List<HealthRecord> healthRecords = healthMapper.selectHealthRecordById(elderId);
         return Result.success(healthRecords);
     }
 
     @Override
-    public Result<List<FamilyContact>> getFamilyContacts(Integer elderId) {
+    public Result<List<FamilyContact>> getFamilyContacts(Long elderId) {
         List<FamilyContact> familyContacts = familyMapper.selectFamilyContactById(elderId);
         return Result.success(familyContacts);
     }

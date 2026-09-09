@@ -11,13 +11,13 @@ import com.github.pagehelper.PageInfo;
 import java.util.List;
 
 public interface ProfileService {
-    Result<ElderProfileDetailDTO> getElderProfile(Integer id);
+    Result<ElderProfileDetailDTO> getElderProfile(Long id);
 
     Result<Void> updateElderProfile(ElderProfileUpdateDTO elderProfileUpdateDTO);
 
-    Result<List<HealthRecord>> getHealthRecords(Integer elderId);
+    Result<List<HealthRecord>> getHealthRecords(Long elderId);
 
-    Result<List<FamilyContact>> getFamilyContacts(Integer elderId);
+    Result<List<FamilyContact>> getFamilyContacts(Long elderId);
 
     PageInfo<ElderProfileQueryDTO> listByPage(int pageNum, int pageSize, Integer elderId);
 }

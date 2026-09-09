@@ -34,6 +34,6 @@ public class DevicesController {
                                     @RequestParam(required = false) Integer elderId) {
         PageInfo<DeviceQueryDTO> pageInfo = deviceService.listByPage(pageNum, pageSize, elderId);
 
-        return PageResult.of(pageInfo.getList(), pageInfo.getTotal());
+        return PageResult.of(pageInfo.getList(), pageInfo.getTotal(),pageNum, pageSize);
     }
 }
