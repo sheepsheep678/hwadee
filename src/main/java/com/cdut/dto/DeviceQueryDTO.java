@@ -1,6 +1,6 @@
 package com.cdut.dto;
 
-import com.cdut.pojo.ElderProfile;
+import com.cdut.pojo.DeviceInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,12 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ElderProfileQueryDTO extends ElderProfile {
+public class DeviceQueryDTO extends DeviceInfo {
 
+   // 关键字：设备SN/名称模糊查询 /
 
+   private String keyword;
+   // 归属老人ID（可选筛选） /
 
-   // 标签ID（重点人群筛选） /
-
-   private Long tagId;
+   private Integer elderId;
 
 }

@@ -8,33 +8,32 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * 统一分页返回体
- *
- * <p>字段与 PageHelper 的 PageInfo 保持一致（total / pages / pageNum / pageSize / list），
- * 前端按同一套结构解析，无需改动。
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PageResult<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    // 总记录数 /
+    private Long total;
 
-    /** 总记录数 */
-    private long total;
+    // 总页数 /
+    private Integer pages;
 
-    /** 总页数 */
-    private int pages;
+    // 当前页码 /
+    private Integer pageNum = 1;
 
-    /** 当前页码 */
-    private int pageNum;
+    // 每页条数 /
+    private Integer pageSize = 10;
 
-    /** 每页条数 */
-    private int pageSize;
-
-    /** 当前页数据 */
+    // 当前页数据列表 /
     private List<T> list;
+
+    // 快捷构建分页结果 /
+    public static <T> PageResult<T> of(List<T> list, long total, int pageNum, int pageSize) {
+        int pages = pageSize > 0 ? (int) ((total + pageSize - 1) / pageSize) : 0;
+        return new PageResult<>(total, pages, pageNum, pageSize, list);
+    }
 
     public static <T> PageResult<T> of(long total, int pageNum, int pageSize, List<T> list) {
         int pages = pageSize <= 0 ? 0 : (int) ((total + pageSize - 1) / pageSize);
@@ -42,7 +41,9 @@ public class PageResult<T> implements Serializable {
                 list == null ? Collections.emptyList() : list);
     }
 
-    /** 空分页 */
+    /**
+     * 空分页
+     */
     public static <T> PageResult<T> empty(int pageNum, int pageSize) {
         return new PageResult<>(0, 0, pageNum, pageSize, Collections.emptyList());
     }

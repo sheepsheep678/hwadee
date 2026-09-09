@@ -1,42 +1,56 @@
 package com.cdut.controller;
 
+import com.cdut.dto.DeviceQueryDTO;
 import com.cdut.dto.ElderProfileDetailDTO;
-import com.cdut.mapper.ProfileMapper;
-import com.cdut.pojo.Result;
+import com.cdut.dto.ElderProfileQueryDTO;
+import com.cdut.dto.ElderProfileUpdateDTO;
+import com.cdut.pojo.*;
 import com.cdut.service.ProfileService;
-import com.cdut.utils.UserContext;
+import com.github.pagehelper.PageInfo;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-/**
- * 老人端 · 我的档案
- *
- * <p>路径 /api/elder/profile —— 与个人中心 /api/elder/center 分开。
- * <p>注意：JWT 里存的是账户ID，查档案/健康档案/家属联系人/标签都要先换算成档案ID。
- */
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/elder/profile")
+@RequestMapping("/api/elder")
 public class ProfileController {
-
     @Autowired
     private ProfileService profileService;
-    @Autowired
-    private ProfileMapper profileMapper;
+    @GetMapping("/profile")
+    public Result<ElderProfileDetailDTO> queryElderProfile(HttpServletRequest request){
+        // 1. 从 request 中获取拦截器解析并放入的 userId
+        String userId = (String) request.getAttribute("currentUserId");
 
-    @GetMapping
-    public Result<ElderProfileDetailDTO> queryElderProfile() {
-        Long accountId = UserContext.getUserId();
-        if (accountId == null) {
+        // 如果没有取到，说明拦截器放行但没设置好，或者token里没有存这个信息
+        if (userId == null) {
             return Result.error("用户信息获取失败");
         }
+        return profileService.getElderProfile(Integer.valueOf(userId));
+    }
+    @GetMapping("/profile/page")
+    public PageResult<ElderProfileQueryDTO> list(@RequestParam(defaultValue = "1") int pageNum,
+                                                 @RequestParam(defaultValue = "10") int pageSize,
+                                                 @RequestParam(required = false) Integer elderId) {
+        PageInfo<ElderProfileQueryDTO> pageInfo = profileService.listByPage(pageNum, pageSize, elderId);
 
-        Long elderId = profileMapper.selectElderIdByAccountId(accountId);
-        if (elderId == null) {
-            return Result.error("未查询到老人档案");
-        }
+        return PageResult.of(pageInfo.getList(), pageInfo.getTotal());
+    }
 
-        return profileService.getElderProfile(elderId);
+
+    @PutMapping("/profile")
+    public Result<Void> modifyElderProfile(@RequestBody ElderProfileUpdateDTO elderProfileUpdateDTO) {
+        return profileService.updateElderProfile(elderProfileUpdateDTO);
+    }
+
+    @GetMapping("/profile/health-records")
+    public Result<List<HealthRecord>> getHealthRecords(@RequestParam Integer elderId) {
+        return profileService.getHealthRecords(elderId);
+    }
+
+    @GetMapping("/profile/family-contacts")
+    public Result<List<FamilyContact>> getFamilyContacts(@RequestParam Integer elderId) {
+        return profileService.getFamilyContacts(elderId);
     }
 }

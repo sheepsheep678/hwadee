@@ -1,14 +1,23 @@
 package com.cdut.service;
 
 import com.cdut.dto.ElderProfileDetailDTO;
+import com.cdut.dto.ElderProfileQueryDTO;
+import com.cdut.dto.ElderProfileUpdateDTO;
+import com.cdut.pojo.FamilyContact;
+import com.cdut.pojo.HealthRecord;
 import com.cdut.pojo.Result;
+import com.github.pagehelper.PageInfo;
+
+import java.util.List;
 
 public interface ProfileService {
+    Result<ElderProfileDetailDTO> getElderProfile(Integer id);
 
-    /**
-     * 查询老人档案详情（含健康档案、家属联系人、标签）
-     *
-     * @param elderId 档案ID（elder_profile.id），不是账户ID
-     */
-    Result<ElderProfileDetailDTO> getElderProfile(Long elderId);
+    Result<Void> updateElderProfile(ElderProfileUpdateDTO elderProfileUpdateDTO);
+
+    Result<List<HealthRecord>> getHealthRecords(Integer elderId);
+
+    Result<List<FamilyContact>> getFamilyContacts(Integer elderId);
+
+    PageInfo<ElderProfileQueryDTO> listByPage(int pageNum, int pageSize, Integer elderId);
 }
