@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cdut.mapper.ElderProfileMapper">
+
+    <!-- 分页查询老人档案：姓名模糊、身份证、电话模糊、居住类型、重点人群标签过滤 -->
+    <select id="selectProfilePage" resultType="com.cdut.entity.ElderProfile">
+        SELECT
+            p.*
+        FROM elder_profile p
+        <where>
+            p.deleted = 0
+            <if test="query.name != null and query.name != ''">
+                AND p.name LIKE CONCAT('%', #{query.name}, '%')
+            </if>
+            <if test="query.idCard != null and query.idCard != ''">
+                AND p.id_card = #{query.idCard}
+            </if>
+            <if test="query.phone != null and query.phone != ''">
+                AND p.phone LIKE CONCAT('%', #{query.phone}, '%')
+            </if>
+            <if test="query.livingType != null">
+                AND p.living_type = #{query.livingType}
+            </if>
+            <if test="query.tagId != null">
+                AND EXISTS (
+                    SELECT 1 FROM elder_tag_relation r
+                    WHERE r.elder_id = p.id AND r.tag_id = #{query.tagId}
+                )
+            </if>
+        </where>
+        ORDER BY p.create_time DESC
+    </select>
+
+</mapper>

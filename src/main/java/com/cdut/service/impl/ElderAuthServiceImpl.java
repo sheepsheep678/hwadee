@@ -3,6 +3,7 @@ package com.cdut.service.impl;
 import com.cdut.dto.ElderLoginDTO;
 import com.cdut.dto.ElderRegisterDTO;
 import com.cdut.dto.LoginRespDTO;
+import com.cdut.dto.UserInfoDTO;
 import com.cdut.exception.BizException;
 import com.cdut.mapper.ElderAccountMapper;
 import com.cdut.mapper.ProfileMapper;
@@ -119,7 +120,7 @@ public class ElderAuthServiceImpl implements ElderAuthService {
         resp.setRefreshToken(token);
         resp.setExpiresIn(jwtUtils.getExpireSeconds());
 
-        LoginRespDTO.UserInfo userInfo = new LoginRespDTO.UserInfo();
+        UserInfoDTO userInfo = new UserInfoDTO();
         userInfo.setUserId(account.getId());
         userInfo.setUsername(account.getAccountNo());
         userInfo.setRealName(profile == null ? null : profile.getName());

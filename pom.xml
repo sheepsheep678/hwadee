@@ -98,8 +98,17 @@
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>1.4.7</version>
+            <version>2.1.0</version>
         </dependency>
+
+
+        <!-- MyBatis-Plus SQL 解析器（分页、多租户等功能依赖） -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>3.5.9</version>
+        </dependency>
+
 
 
     </dependencies>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cdut.mapper.ServiceRecordMapper">
+
+    <!-- 统计医生绩效：服务次数、服务老人数、随访次数、平均评分 -->
+    <select id="selectPerformance" resultType="com.cdut.dto.DoctorPerformanceDTO">
+        SELECT
+            COUNT(s.id)                 AS service_count,
+            COUNT(DISTINCT s.elder_id)  AS elder_count,
+            (
+                SELECT COUNT(*)
+                FROM follow_up_record f
+                WHERE f.doctor_id = #{doctorId}
+                <if test="startDate != null">AND f.follow_up_date &gt;= #{startDate}</if>
+                <if test="endDate != null">AND f.follow_up_date &lt;= #{endDate}</if>
+            )                           AS follow_up_count,
+            AVG(s.rating)               AS avg_rating
+        FROM service_record s
+        WHERE s.doctor_id = #{doctorId}
+        <if test="startDate != null">AND s.service_date &gt;= #{startDate}</if>
+        <if test="endDate != null">AND s.service_date &lt;= #{endDate}</if>
+    </select>
+
+</mapper>

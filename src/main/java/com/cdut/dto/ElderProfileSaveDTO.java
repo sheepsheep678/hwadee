@@ -42,4 +42,8 @@ public class ElderProfileSaveDTO extends ElderProfile {
 
    private List<HealthRecordDTO> healthRecords;
 
+   // 重点人群标签ID列表 /
+
+   private List<Long> tagIds;
+
 }

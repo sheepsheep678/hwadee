@@ -1,6 +1,8 @@
 package com.cdut.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -8,6 +10,8 @@ import java.util.List;
  * 登录出参（三端通用）
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class LoginRespDTO {
 
     private String accessToken;
@@ -18,7 +22,14 @@ public class LoginRespDTO {
     /** 有效期（秒） */
     private Long expiresIn;
 
-    private UserInfo userInfo;
+    private UserInfoDTO userInfo;
+
+    public LoginRespDTO(String accessToken, String refreshToken, long expire, UserInfoDTO userInfo) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.expiresIn = expire;
+        this.userInfo = userInfo;
+    }
 
     @Data
     public static class UserInfo {
