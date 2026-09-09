@@ -1,22 +1,27 @@
 package com.cdut.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cdut.common.BusinessException;
-import com.cdut.common.PageInfo;
-import com.cdut.dto.*;
-import com.cdut.entity.ElderProfile;
-import com.cdut.entity.ElderTag;
-import com.cdut.entity.ElderTagRelation;
-import com.cdut.pojo.HealthRecord;
-import com.cdut.mapper.*;
+import com.cdut.dto.ElderProfileDetailDTO;
+import com.cdut.dto.ElderProfileQueryDTO;
+import com.cdut.dto.ElderProfileSaveDTO;
+import com.cdut.dto.FamilyContactDTO;
+import com.cdut.dto.HealthRecordDTO;
+import com.cdut.exception.BizException;
+import com.cdut.mapper.ElderProfileMapper;
+import com.cdut.mapper.ElderTagMapper;
+import com.cdut.mapper.ElderTagRelationMapper;
+import com.cdut.mapper.FamilyContactMapper;
+import com.cdut.mapper.HealthRecordMapper;
+import com.cdut.pojo.ElderProfile;
+import com.cdut.pojo.ElderTag;
+import com.cdut.pojo.ElderTagRelation;
 import com.cdut.pojo.FamilyContact;
+import com.cdut.pojo.HealthRecord;
+import com.cdut.pojo.PageResult;
 import com.cdut.service.ElderProfileService;
-import com.cdut.util.UserContext;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,30 +43,24 @@ public class ElderProfileServiceImpl implements ElderProfileService {
     private final ElderTagMapper elderTagMapper;
     private final ElderTagRelationMapper tagRelationMapper;
 
-    @Value("${file.upload-dir:./uploads}")
-    private String uploadDir;
-
     @Override
-    public PageInfo<ElderProfile> page(ElderProfileQueryDTO query) {
-        Page<ElderProfile> page = new Page<>(query.safePageNum(), query.safePageSize());
-        IPage<ElderProfile> result = elderProfileMapper.selectProfilePage(page, query);
-        return PageInfo.of(result);
+    public PageResult<ElderProfile> page(ElderProfileQueryDTO query) {
+        PageHelper.startPage(query.safePageNum(), query.safePageSize());
+        List<ElderProfile> list = elderProfileMapper.selectProfilePage(query);
+        PageInfo<ElderProfile> pageInfo = new PageInfo<>(list);
+        return PageResult.of(pageInfo.getList(), pageInfo.getTotal(), query.safePageNum(), query.safePageSize());
     }
 
     @Override
     public ElderProfileDetailDTO detail(Long id) {
         ElderProfile profile = elderProfileMapper.selectById(id);
         if (profile == null) {
-            throw new BusinessException("老人档案不存在");
+            throw new BizException("老人档案不存在");
         }
         ElderProfileDetailDTO dto = new ElderProfileDetailDTO();
         BeanUtils.copyProperties(profile, dto);
-        dto.setHealthRecords(healthRecordMapper.selectList(
-                new LambdaQueryWrapper<HealthRecord>()
-                        .eq(HealthRecord::getElderId, id)
-                        .orderByDesc(HealthRecord::getCreateTime)));
-        dto.setFamilyContacts(familyContactMapper.selectList(
-                new LambdaQueryWrapper<FamilyContact>().eq(FamilyContact::getElderId, id)));
+        dto.setHealthRecords(healthRecordMapper.selectByElderId(id));
+        dto.setFamilyContacts(familyContactMapper.selectByElderId(id));
         dto.setTags(queryTagsByElder(id));
         return dto;
     }
@@ -72,7 +71,9 @@ public class ElderProfileServiceImpl implements ElderProfileService {
         checkIdCardUnique(dto.getIdCard(), null);
         ElderProfile profile = new ElderProfile();
         BeanUtils.copyProperties(dto, profile);
-        profile.setCreateBy(UserContext.requireDoctorId());
+        if (profile.getStatus() == null) {
+            profile.setStatus(1);
+        }
         profile.setCreateTime(LocalDateTime.now());
         profile.setUpdateTime(LocalDateTime.now());
         elderProfileMapper.insert(profile);
@@ -84,14 +85,14 @@ public class ElderProfileServiceImpl implements ElderProfileService {
     @Transactional(rollbackFor = Exception.class)
     public void update(Long id, ElderProfileSaveDTO dto) {
         if (elderProfileMapper.selectById(id) == null) {
-            throw new BusinessException("老人档案不存在");
+            throw new BizException("老人档案不存在");
         }
         checkIdCardUnique(dto.getIdCard(), id);
         ElderProfile profile = new ElderProfile();
         BeanUtils.copyProperties(dto, profile);
         profile.setId(id);
         profile.setUpdateTime(LocalDateTime.now());
-        elderProfileMapper.updateById(profile);
+        elderProfileMapper.update(profile);
         // 重建子表数据
         deleteChildren(id);
         saveChildren(id, dto);
@@ -101,7 +102,7 @@ public class ElderProfileServiceImpl implements ElderProfileService {
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         if (elderProfileMapper.selectById(id) == null) {
-            throw new BusinessException("老人档案不存在");
+            throw new BizException("老人档案不存在");
         }
         elderProfileMapper.deleteById(id);
         deleteChildren(id);
@@ -114,14 +115,8 @@ public class ElderProfileServiceImpl implements ElderProfileService {
     }
 
     private void checkIdCardUnique(String idCard, Long excludeId) {
-        LambdaQueryWrapper<ElderProfile> wrapper = new LambdaQueryWrapper<ElderProfile>()
-                .eq(ElderProfile::getIdCard, idCard);
-        if (excludeId != null) {
-            wrapper.ne(ElderProfile::getId, excludeId);
-        }
-        Long count = elderProfileMapper.selectCount(wrapper);
-        if (count != null && count > 0) {
-            throw new BusinessException("该身份证号已存在档案记录");
+        if (elderProfileMapper.countByIdCard(idCard, excludeId) > 0) {
+            throw new BizException("该身份证号已存在档案记录");
         }
     }
 
@@ -140,6 +135,7 @@ public class ElderProfileServiceImpl implements ElderProfileService {
             for (FamilyContactDTO contact : dto.getFamilyContacts()) {
                 contact.setId(null);
                 contact.setElderId(elderId);
+                contact.setCreateTime(LocalDateTime.now());
                 familyContactMapper.insert(contact);
             }
         }
@@ -148,26 +144,24 @@ public class ElderProfileServiceImpl implements ElderProfileService {
                 ElderTagRelation relation = new ElderTagRelation();
                 relation.setElderId(elderId);
                 relation.setTagId(tagId);
-                relation.setCreateTime(LocalDateTime.now());
                 tagRelationMapper.insert(relation);
             }
         }
     }
 
     private void deleteChildren(Long elderId) {
-        healthRecordMapper.delete(new LambdaQueryWrapper<HealthRecord>().eq(HealthRecord::getElderId, elderId));
-        familyContactMapper.delete(new LambdaQueryWrapper<FamilyContact>().eq(FamilyContact::getElderId, elderId));
-        tagRelationMapper.delete(new LambdaQueryWrapper<ElderTagRelation>().eq(ElderTagRelation::getElderId, elderId));
+        healthRecordMapper.deleteByElderId(elderId);
+        familyContactMapper.deleteByElderId(elderId);
+        tagRelationMapper.deleteByElderId(elderId);
     }
 
     private List<String> queryTagsByElder(Long elderId) {
-        List<ElderTagRelation> relations = tagRelationMapper.selectList(
-                new LambdaQueryWrapper<ElderTagRelation>().eq(ElderTagRelation::getElderId, elderId));
+        List<ElderTagRelation> relations = tagRelationMapper.selectByElderId(elderId);
         if (relations.isEmpty()) {
             return Collections.emptyList();
         }
         List<Long> tagIds = relations.stream().map(ElderTagRelation::getTagId).collect(Collectors.toList());
-        return elderTagMapper.selectBatchIds(tagIds).stream()
+        return elderTagMapper.selectByIds(tagIds).stream()
                 .map(ElderTag::getTagName)
                 .collect(Collectors.toList());
     }

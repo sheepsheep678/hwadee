@@ -1,15 +1,15 @@
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import {
   getElderProfiles,
+  getElderProfileDetail,
   addElderProfile,
   updateElderProfile,
   deleteElderProfile,
+  exportElderProfiles,
 } from '@/api/elder'
-
-const USE_MOCK = true
 
 const queryForm = reactive({
   name: '',
@@ -20,9 +20,14 @@ const queryForm = reactive({
 
 const pageNum = ref(1)
 const pageSize = ref(10)
+const total = ref(0)
+const loading = ref(false)
 
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增老人档案')
+
+const detailVisible = ref(false)
+const currentDetail = ref({})
 
 const form = reactive({
   id: null,
@@ -38,80 +43,27 @@ const form = reactive({
   status: 1,
 })
 
-const tableData = ref([
-  {
-    id: 1,
-    elderNo: 'ELD20260001',
-    name: '张建国',
-    gender: 1,
-    birthDate: '1952-03-18',
-    idCard: '510***********1234',
-    phone: '13800138001',
-    livingType: 1,
-    address: '成都市成华区',
-    medicareNo: 'YB20260001',
-    status: 1,
-  },
-  {
-    id: 2,
-    elderNo: 'ELD20260002',
-    name: '李桂芳',
-    gender: 2,
-    birthDate: '1948-07-26',
-    idCard: '510***********5678',
-    phone: '13800138002',
-    livingType: 4,
-    address: '成都市锦江区',
-    medicareNo: 'YB20260002',
-    status: 1,
-  },
-  {
-    id: 3,
-    elderNo: 'ELD20260003',
-    name: '王国强',
-    gender: 1,
-    birthDate: '1956-11-09',
-    idCard: '510***********9012',
-    phone: '13800138003',
-    livingType: 3,
-    address: '成都市武侯区',
-    medicareNo: 'YB20260003',
-    status: 1,
-  },
-])
-
-const filteredData = computed(() => {
-  return tableData.value.filter((item) => {
-    const matchName = !queryForm.name || item.name.includes(queryForm.name)
-
-    const matchIdCard = !queryForm.idCard || item.idCard.includes(queryForm.idCard)
-
-    const matchPhone = !queryForm.phone || item.phone.includes(queryForm.phone)
-
-    const matchLiving = !queryForm.livingType || item.livingType === Number(queryForm.livingType)
-
-    return matchName && matchIdCard && matchPhone && matchLiving
-  })
-})
+const tableData = ref([])
 
 const loadData = async () => {
-  if (USE_MOCK) {
-    return
-  }
+  loading.value = true
 
   try {
     const result = await getElderProfiles({
       pageNum: pageNum.value,
       pageSize: pageSize.value,
-      name: queryForm.name,
-      idCard: queryForm.idCard,
-      phone: queryForm.phone,
-      livingType: queryForm.livingType,
+      name: queryForm.name || undefined,
+      idCard: queryForm.idCard || undefined,
+      phone: queryForm.phone || undefined,
+      livingType: queryForm.livingType || undefined,
     })
 
     tableData.value = result.data.list || []
+    total.value = result.data.total || 0
   } catch (error) {
     console.error('查询老人档案失败：', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -128,6 +80,18 @@ const livingTypeText = (type) => {
 
 const genderText = (gender) => {
   return gender === 1 ? '男' : '女'
+}
+
+const recordTypeText = (type) => {
+  const map = {
+    1: '既往史',
+    2: '过敏史',
+    3: '用药史',
+    4: '手术史',
+    5: '家族史',
+  }
+
+  return map[type] || '-'
 }
 
 const resetForm = () => {
@@ -175,39 +139,16 @@ const handleSave = async () => {
   }
 
   try {
-    if (USE_MOCK) {
-      if (form.id) {
-        const index = tableData.value.findIndex((item) => item.id === form.id)
-
-        if (index !== -1) {
-          tableData.value[index] = {
-            ...form,
-          }
-        }
-
-        ElMessage.success('修改成功')
-      } else {
-        tableData.value.push({
-          ...form,
-          id: Date.now(),
-          elderNo: `ELD${Date.now()}`,
-        })
-
-        ElMessage.success('新增成功')
-      }
+    if (form.id) {
+      await updateElderProfile(form.id, form)
+      ElMessage.success('修改成功')
     } else {
-      if (form.id) {
-        await updateElderProfile(form.id, form)
-        ElMessage.success('修改成功')
-      } else {
-        await addElderProfile(form)
-        ElMessage.success('新增成功')
-      }
-
-      await loadData()
+      await addElderProfile(form)
+      ElMessage.success('新增成功')
     }
 
     dialogVisible.value = false
+    await loadData()
   } catch (error) {
     console.error('保存老人档案失败：', error)
   }
@@ -221,18 +162,45 @@ const handleDelete = async (row) => {
       type: 'warning',
     })
 
-    if (USE_MOCK) {
-      tableData.value = tableData.value.filter((item) => item.id !== row.id)
-    } else {
-      await deleteElderProfile(row.id)
-      await loadData()
-    }
-
+    await deleteElderProfile(row.id)
     ElMessage.success('删除成功')
+    await loadData()
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除老人档案失败：', error)
     }
+  }
+}
+
+const handleDetail = async (row) => {
+  try {
+    const result = await getElderProfileDetail(row.id)
+    currentDetail.value = result.data || {}
+    detailVisible.value = true
+  } catch (error) {
+    console.error('获取老人档案详情失败：', error)
+  }
+}
+
+const handleExport = async () => {
+  try {
+    const result = await exportElderProfiles({
+      name: queryForm.name || undefined,
+      idCard: queryForm.idCard || undefined,
+      phone: queryForm.phone || undefined,
+      livingType: queryForm.livingType || undefined,
+    })
+
+    const url = result.data
+
+    if (url) {
+      window.open(url, '_blank')
+      ElMessage.success('导出成功')
+    } else {
+      ElMessage.success('导出任务已提交')
+    }
+  } catch (error) {
+    console.error('导出老人档案失败：', error)
   }
 }
 
@@ -250,6 +218,12 @@ const handleReset = () => {
   pageNum.value = 1
   loadData()
 }
+
+const handlePageChange = () => {
+  loadData()
+}
+
+loadData()
 </script>
 
 <template>
@@ -260,7 +234,10 @@ const handleReset = () => {
         <p>查询和维护老人基本档案信息</p>
       </div>
 
-      <el-button type="primary" @click="handleAdd"> 新增档案 </el-button>
+      <div class="header-actions">
+        <el-button @click="handleExport"> 批量导出 </el-button>
+        <el-button type="primary" @click="handleAdd"> 新增档案 </el-button>
+      </div>
     </div>
 
     <!-- 查询区域 -->
@@ -302,7 +279,7 @@ const handleReset = () => {
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table :data="filteredData" style="width: 100%">
+      <el-table v-loading="loading" :data="tableData" style="width: 100%">
         <el-table-column prop="elderNo" label="老人编号" width="150" />
 
         <el-table-column prop="name" label="姓名" width="100" />
@@ -333,8 +310,10 @@ const handleReset = () => {
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
+            <el-button link type="primary" @click="handleDetail(row)"> 详情 </el-button>
+
             <el-button link type="primary" @click="handleEdit(row)"> 编辑 </el-button>
 
             <el-button link type="danger" @click="handleDelete(row)"> 删除 </el-button>
@@ -348,7 +327,8 @@ const handleReset = () => {
           v-model:page-size="pageSize"
           background
           layout="total, prev, pager, next"
-          :total="filteredData.length"
+          :total="total"
+          @current-change="handlePageChange"
         />
       </div>
     </el-card>
@@ -426,6 +406,97 @@ const handleReset = () => {
         <el-button type="primary" @click="handleSave"> 保存 </el-button>
       </template>
     </el-dialog>
+
+    <!-- 详情 -->
+    <el-dialog v-model="detailVisible" title="老人档案详情" width="760px">
+      <el-descriptions :column="3" border>
+        <el-descriptions-item label="老人编号">
+          {{ currentDetail.elderNo }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="姓名">
+          {{ currentDetail.name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="性别">
+          {{ genderText(currentDetail.gender) }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="出生日期">
+          {{ currentDetail.birthDate }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="联系电话">
+          {{ currentDetail.phone }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="居住方式">
+          {{ livingTypeText(currentDetail.livingType) }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="身份证号" :span="2">
+          {{ currentDetail.idCard }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="医保号">
+          {{ currentDetail.medicareNo || '-' }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="居住地址" :span="3">
+          {{ currentDetail.address || '-' }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="重点标签" :span="3">
+          <el-tag
+            v-for="(tag, index) in currentDetail.tags || []"
+            :key="index"
+            class="tag-item"
+            type="warning"
+          >
+            {{ tag }}
+          </el-tag>
+          <span v-if="!currentDetail.tags || currentDetail.tags.length === 0">-</span>
+        </el-descriptions-item>
+      </el-descriptions>
+
+      <div class="sub-title">健康档案</div>
+
+      <el-table :data="currentDetail.healthRecords || []" style="width: 100%">
+        <el-table-column label="记录类型" width="100">
+          <template #default="{ row }">
+            {{ recordTypeText(row.recordType) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="diseaseName" label="疾病 / 事项" width="140" />
+
+        <el-table-column prop="hospital" label="就诊医院" min-width="160" />
+
+        <el-table-column prop="diagnoseDate" label="确诊日期" width="110" />
+
+        <el-table-column prop="medication" label="当前用药" width="130" />
+      </el-table>
+
+      <div class="sub-title">家属联系人</div>
+
+      <el-table :data="currentDetail.familyContacts || []" style="width: 100%">
+        <el-table-column prop="name" label="姓名" width="110" />
+
+        <el-table-column prop="relation" label="关系" width="110" />
+
+        <el-table-column prop="phone" label="联系电话" width="150" />
+
+        <el-table-column label="紧急联系人" width="120">
+          <template #default="{ row }">
+            <el-tag :type="row.isPrimary === 1 ? 'danger' : 'info'">
+              {{ row.isPrimary === 1 ? '是' : '否' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="address" label="地址" min-width="160" />
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -452,6 +523,11 @@ const handleReset = () => {
   font-size: 14px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .search-card {
   margin-bottom: 20px;
 }
@@ -464,5 +540,16 @@ const handleReset = () => {
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
+}
+
+.sub-title {
+  margin: 20px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.tag-item {
+  margin-right: 8px;
 }
 </style>

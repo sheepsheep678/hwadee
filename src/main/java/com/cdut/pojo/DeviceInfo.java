@@ -73,4 +73,12 @@ public class DeviceInfo {
 
    private Integer isDeleted;
 
+   // 绑定老人姓名（联表填充，非表字段） /
+
+   private String elderName;
+
+   // 绑定老人联系电话（联表填充，非表字段） /
+
+   private String elderPhone;
+
 }

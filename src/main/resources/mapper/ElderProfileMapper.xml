@@ -3,12 +3,12 @@
 <mapper namespace="com.cdut.mapper.ElderProfileMapper">
 
     <!-- 分页查询老人档案：姓名模糊、身份证、电话模糊、居住类型、重点人群标签过滤 -->
-    <select id="selectProfilePage" resultType="com.cdut.entity.ElderProfile">
+    <select id="selectProfilePage" resultType="com.cdut.pojo.ElderProfile">
         SELECT
             p.*
         FROM elder_profile p
         <where>
-            p.deleted = 0
+            p.is_deleted = 0
             <if test="query.name != null and query.name != ''">
                 AND p.name LIKE CONCAT('%', #{query.name}, '%')
             </if>

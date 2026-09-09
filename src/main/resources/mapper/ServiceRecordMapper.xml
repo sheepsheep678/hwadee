@@ -11,12 +11,14 @@
                 SELECT COUNT(*)
                 FROM follow_up_record f
                 WHERE f.doctor_id = #{doctorId}
-                <if test="startDate != null">AND f.follow_up_date &gt;= #{startDate}</if>
-                <if test="endDate != null">AND f.follow_up_date &lt;= #{endDate}</if>
+                AND f.is_deleted = 0
+                <if test="startDate != null">AND f.follow_date &gt;= #{startDate}</if>
+                <if test="endDate != null">AND f.follow_date &lt;= #{endDate}</if>
             )                           AS follow_up_count,
             AVG(s.rating)               AS avg_rating
         FROM service_record s
         WHERE s.doctor_id = #{doctorId}
+        AND s.is_deleted = 0
         <if test="startDate != null">AND s.service_date &gt;= #{startDate}</if>
         <if test="endDate != null">AND s.service_date &lt;= #{endDate}</if>
     </select>

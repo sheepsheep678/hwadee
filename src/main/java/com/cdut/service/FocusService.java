@@ -1,12 +1,12 @@
 package com.cdut.service;
 
-import com.cdut.common.PageInfo;
 import com.cdut.dto.FollowUpPlanQueryDTO;
 import com.cdut.dto.FollowUpPlanSaveDTO;
 import com.cdut.dto.FollowUpRecordDTO;
-import com.cdut.entity.ElderTag;
-import com.cdut.entity.FollowUpPlan;
-import com.cdut.entity.FollowUpRecord;
+import com.cdut.pojo.ElderTag;
+import com.cdut.pojo.FollowUpPlan;
+import com.cdut.pojo.FollowUpRecord;
+import com.cdut.pojo.PageResult;
 
 import java.util.List;
 
@@ -18,13 +18,11 @@ public interface FocusService {
     /** 标签列表 */
     List<ElderTag> tags();
 
-
-
     /** 取消老人标签 */
     void unbindTag(Long elderId, Long tagId);
 
     /** 随访计划分页查询 */
-    PageInfo<FollowUpPlan> planPage(FollowUpPlanQueryDTO query);
+    PageResult<FollowUpPlan> planPage(FollowUpPlanQueryDTO query);
 
     /** 新增随访计划 */
     void savePlan(FollowUpPlanSaveDTO dto);
@@ -39,6 +37,6 @@ public interface FocusService {
     void addRecord(FollowUpRecordDTO dto);
 
     /** 随访记录分页查询 */
-    PageInfo<FollowUpRecord> recordPage(FollowUpRecordDTO query);
+    PageResult<FollowUpRecord> recordPage(FollowUpRecordDTO query);
 
 }

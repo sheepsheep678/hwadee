@@ -1,45 +1,11 @@
 <script setup>
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 
 import { getMyDevices } from '@/api/elderUser'
 
-const USE_MOCK = true
-
-const devices = ref([
-  {
-    id: 1,
-    deviceSn: 'DEV20260001',
-    deviceName: '智能健康手环',
-    deviceType: 2,
-    model: 'HB-2026A',
-    brand: '华康',
-    onlineStatus: 1,
-    batteryLevel: 86,
-    status: 1,
-  },
-  {
-    id: 2,
-    deviceSn: 'DEV20260002',
-    deviceName: '智能床垫',
-    deviceType: 1,
-    model: 'SM-100',
-    brand: '安养',
-    onlineStatus: 1,
-    batteryLevel: 100,
-    status: 1,
-  },
-  {
-    id: 3,
-    deviceSn: 'DEV20260003',
-    deviceName: '紧急呼叫器',
-    deviceType: 3,
-    model: 'SOS-X1',
-    brand: '康护',
-    onlineStatus: 0,
-    batteryLevel: 23,
-    status: 1,
-  },
-])
+const devices = ref([])
+const loading = ref(false)
 
 const deviceTypeText = (type) => {
   const map = {
@@ -64,15 +30,35 @@ const statusText = (status) => {
 }
 
 const loadDevices = async () => {
-  if (USE_MOCK) {
+  // 从登录信息里取老人档案ID
+  let elderId = null
+
+  const raw = localStorage.getItem('elderUserInfo')
+
+  if (raw) {
+    try {
+      const userInfo = JSON.parse(raw)
+
+      elderId = userInfo.elderId
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  if (!elderId) {
+    ElMessage.warning('未能获取老人档案信息，请重新登录')
     return
   }
 
+  loading.value = true
+
   try {
-    const result = await getMyDevices()
+    const result = await getMyDevices(elderId)
     devices.value = result.data || []
   } catch (error) {
     console.error('获取老人设备失败：', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -88,7 +74,7 @@ loadDevices()
       </div>
     </div>
 
-    <el-row :gutter="20">
+    <el-row v-loading="loading" :gutter="20">
       <el-col v-for="device in devices" :key="device.id" :xs="24" :sm="12" :lg="8">
         <el-card shadow="hover" class="device-card">
           <div class="device-top">
@@ -136,13 +122,13 @@ loadDevices()
               <span>{{ device.batteryLevel }}%</span>
             </div>
 
-            <el-progress :percentage="device.batteryLevel" :stroke-width="10" />
+            <el-progress :percentage="device.batteryLevel || 0" :stroke-width="10" />
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-empty v-if="devices.length === 0" description="暂无绑定设备" />
+    <el-empty v-if="!loading && devices.length === 0" description="暂无绑定设备" />
   </div>
 </template>
 

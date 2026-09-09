@@ -1,22 +1,19 @@
 package com.cdut.dto;
 
-import com.cdut.entity.AssessmentReport;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 /**
- * 评估结果提交入参（extends AssessmentReport）
+ * 评估结果提交入参
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class AssessmentSubmitDTO extends AssessmentReport implements Serializable {
+public class AssessmentSubmitDTO implements Serializable {
 
     /** 老人ID */
     @NotNull(message = "老人ID不能为空")

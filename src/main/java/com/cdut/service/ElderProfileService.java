@@ -1,10 +1,10 @@
 package com.cdut.service;
 
-import com.cdut.common.PageInfo;
 import com.cdut.dto.ElderProfileDetailDTO;
 import com.cdut.dto.ElderProfileQueryDTO;
 import com.cdut.dto.ElderProfileSaveDTO;
-import com.cdut.entity.ElderProfile;
+import com.cdut.pojo.ElderProfile;
+import com.cdut.pojo.PageResult;
 
 /**
  * 老人档案管理服务
@@ -12,7 +12,7 @@ import com.cdut.entity.ElderProfile;
 public interface ElderProfileService {
 
     /** 分页查询老人档案 */
-    PageInfo<ElderProfile> page(ElderProfileQueryDTO query);
+    PageResult<ElderProfile> page(ElderProfileQueryDTO query);
 
     /** 查询老人档案详情（含健康档案、家属联系人、标签） */
     ElderProfileDetailDTO detail(Long id);
@@ -25,8 +25,6 @@ public interface ElderProfileService {
 
     /** 删除老人档案 */
     void delete(Long id);
-
-
 
     /** 导出档案，返回文件访问地址 */
     String exportExcel(ElderProfileQueryDTO query);

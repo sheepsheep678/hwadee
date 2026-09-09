@@ -4,9 +4,100 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="48195344-c1f0-4c2b-a287-a0e3ff934473" name="Changes" comment="再次提交医生端">
+    <list default="true" id="48195344-c1f0-4c2b-a287-a0e3ff934473" name="Changes" comment="完成医生端">
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/doctor.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/doctor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/elder.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/elder.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/elderUser.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/elderUser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/request.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/request.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/doctor/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/doctor/Dashboard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/doctor/Device.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/doctor/Device.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/doctor/DoctorLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/doctor/DoctorLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/doctor/ElderProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/doctor/ElderProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/doctor/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/doctor/Login.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/doctor/Profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/doctor/Profile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/elder/Device.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/elder/Device.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/elder/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/elder/Home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/elder/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/elder/Login.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/elder/PersonalCenter.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/elder/PersonalCenter.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/elder/Profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/elder/Profile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/common/BusinessException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/common/PageInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/common/PageQuery.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/common/Result.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/common/ResultCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/config/MybatisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/config/MybatisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorAssessmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorAssessmentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorAuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorAuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorDeviceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorDeviceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorElderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorElderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorFocusController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorFocusController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/DoctorProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/controller/ProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/AssessmentReportQueryDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/AssessmentReportQueryDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/AssessmentSubmitDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/AssessmentSubmitDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/DeviceQueryDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/DeviceQueryDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/DoctorQualificationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/DoctorQualificationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/DoctorSaveDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/DoctorSaveDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/ElderProfileSaveDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/ElderProfileSaveDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/FollowUpPlanQueryDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/FollowUpPlanQueryDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/FollowUpPlanSaveDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/FollowUpPlanSaveDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/FollowUpRecordDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/FollowUpRecordDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/dto/ServiceRecordQueryDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/dto/ServiceRecordQueryDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/AssessmentAnswer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/AssessmentReport.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/AssessmentTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/DeviceInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/DoctorAccount.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/DoctorQualification.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/DoctorSchedule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/ElderProfile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/ElderTag.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/ElderTagRelation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/FollowUpPlan.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/FollowUpRecord.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/entity/ServiceRecord.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/AssessmentAnswerMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/AssessmentReportMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/AssessmentReportMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/AssessmentTemplateMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/AssessmentTemplateMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DeviceInfoMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DeviceInfoMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DoctorAccountMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DoctorAccountMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DoctorQualificationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DoctorQualificationMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DoctorScheduleMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/DoctorScheduleMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ElderProfileMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ElderProfileMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ElderTagMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ElderTagMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ElderTagRelationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ElderTagRelationMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/FamilyContactMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/FamilyContactMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/FollowUpPlanMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/FollowUpPlanMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/FollowUpRecordMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/FollowUpRecordMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/HealthRecordMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/HealthRecordMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ServiceRecordMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/mapper/ServiceRecordMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/pojo/DeviceInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/pojo/DeviceInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/AssessmentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/AssessmentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/DeviceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/DeviceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/DoctorProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/DoctorProfileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/ElderProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/ElderProfileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/FocusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/FocusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/AssessmentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/AssessmentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/DeviceServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/DeviceServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/DoctorAuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/DoctorAuthServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/DoctorProfileServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/DoctorProfileServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/ElderProfileServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/ElderProfileServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/FocusServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cdut/service/impl/FocusServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/util/JwtUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/util/LoginUser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/util/PasswordUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cdut/util/UserContext.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/DeviceInfoMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/DeviceInfoMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/ElderProfileMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/ElderProfileMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/ServiceRecordMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/ServiceRecordMapper.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,18 +117,36 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="customMavenHome" value="D:\Development-Tools\apache-maven-3.9.4-bin\apache-maven-3.9.4" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
+        <option name="userSettingsFile" value="D:\Development-Tools\apache-maven-3.9.4-bin\apache-maven-3.9.4\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="3J5I12sbgXNQFn6Arh27JJwyZ8O" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Maven.yiyang-Project [compile].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "docker",
+    "Spring Boot.YiyangProjectApplication.executor": "Run",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/sheep/Desktop/实训/project/doctor/hwadee",
     "node.js.detected.package.eslint": "true",
@@ -45,6 +154,10 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "MavenSettings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -106,6 +219,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="再次提交医生端" />
-    <option name="LAST_COMMIT_MESSAGE" value="再次提交医生端" />
+    <MESSAGE value="完成医生端" />
+    <option name="LAST_COMMIT_MESSAGE" value="完成医生端" />
   </component>
 </project>

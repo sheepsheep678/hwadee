@@ -43,3 +43,12 @@ export function getDoctorServiceRecords(params) {
     params,
   })
 }
+
+// 获取医生绩效统计
+export function getDoctorPerformance(params) {
+  return request({
+    url: '/doctor/profile/performance',
+    method: 'get',
+    params,
+  })
+}

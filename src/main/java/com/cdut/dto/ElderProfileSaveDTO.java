@@ -24,11 +24,11 @@ public class ElderProfileSaveDTO extends ElderProfile {
    private Integer gender;
 
    @NotBlank(message = "身份证号不能为空")
-   @Pattern(regexp = "^d{17}[dXx]$", message = "身份证号格式错误")
+   @Pattern(regexp = "^\\d{17}[\\dXx]$", message = "身份证号格式错误")
    private String idCard;
 
    @NotBlank(message = "联系电话不能为空")
-   @Pattern(regexp = "^1[3-9]d{9}$", message = "手机号格式错误")
+   @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式错误")
    private String phone;
 
    @NotNull(message = "居住方式不能为空")

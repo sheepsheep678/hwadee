@@ -15,8 +15,18 @@ const cards = [
     path: '/doctor/devices',
   },
   {
+    title: '评估管理',
+    description: '开展能力/健康/体质评估',
+    path: '/doctor/assessments',
+  },
+  {
+    title: '重点随访',
+    description: '重点人群标签与随访计划',
+    path: '/doctor/focus',
+  },
+  {
     title: '个人中心',
-    description: '查看个人信息和排班',
+    description: '查看个人信息、排班与绩效',
     path: '/doctor/profile',
   },
 ]

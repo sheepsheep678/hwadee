@@ -8,20 +8,19 @@ import {
   changeDoctorPassword,
   getDoctorSchedules,
   getDoctorServiceRecords,
+  getDoctorPerformance,
 } from '@/api/profile'
-
-const USE_MOCK = true
 
 const activeTab = ref('info')
 
 const profileForm = reactive({
-  id: 30001,
-  name: 'Violet',
-  phone: '13800138000',
+  id: null,
+  name: '',
+  phone: '',
   doctorType: 1,
-  title: '主治医师',
-  dept: '全科',
-  orgId: 1,
+  title: '',
+  dept: '',
+  orgId: null,
 })
 
 const passwordForm = reactive({
@@ -32,55 +31,19 @@ const passwordForm = reactive({
 
 const scheduleMonth = ref('2026-09')
 
-const scheduleData = ref([
-  {
-    id: 1,
-    scheduleDate: '2026-09-08',
-    timeSlot: 1,
-    scheduleType: 1,
-    capacity: 20,
-    bookedCount: 12,
-    status: 1,
-  },
-  {
-    id: 2,
-    scheduleDate: '2026-09-09',
-    timeSlot: 2,
-    scheduleType: 2,
-    capacity: 10,
-    bookedCount: 6,
-    status: 1,
-  },
-])
+const scheduleData = ref([])
 
-const serviceData = ref([
-  {
-    id: 1,
-    elderName: '张建国',
-    serviceType: 1,
-    serviceItems: '健康巡诊',
-    serviceDate: '2026-09-05 09:30',
-    duration: 40,
-    status: 2,
-    rating: 5,
-  },
-  {
-    id: 2,
-    elderName: '李桂芳',
-    serviceType: 3,
-    serviceItems: '远程问诊',
-    serviceDate: '2026-09-06 15:00',
-    duration: 25,
-    status: 2,
-    rating: 4,
-  },
-])
+const serviceData = ref([])
+
+const performanceRange = ref([])
+const performanceData = ref({
+  serviceCount: 0,
+  elderCount: 0,
+  followUpCount: 0,
+  avgRating: 0,
+})
 
 const loadProfile = async () => {
-  if (USE_MOCK) {
-    return
-  }
-
   try {
     const result = await getDoctorProfile()
     Object.assign(profileForm, result.data || {})
@@ -101,22 +64,29 @@ const saveProfile = async () => {
   }
 
   try {
-    if (USE_MOCK) {
-      localStorage.setItem(
-        'userInfo',
-        JSON.stringify({
-          ...JSON.parse(localStorage.getItem('userInfo') || '{}'),
-          realName: profileForm.name,
-          dept: profileForm.dept,
-          title: profileForm.title,
-        }),
-      )
+    await updateDoctorProfile({
+      name: profileForm.name,
+      phone: profileForm.phone,
+      title: profileForm.title,
+      dept: profileForm.dept,
+    })
 
-      ElMessage.success('个人信息修改成功')
-      return
+    // 同步顶部栏显示
+    const raw = localStorage.getItem('userInfo')
+
+    if (raw) {
+      try {
+        const userInfo = JSON.parse(raw)
+
+        userInfo.realName = profileForm.name
+        userInfo.dept = profileForm.dept
+        userInfo.title = profileForm.title
+        localStorage.setItem('userInfo', JSON.stringify(userInfo))
+      } catch (e) {
+        /* ignore */
+      }
     }
 
-    await updateDoctorProfile(profileForm)
     ElMessage.success('个人信息修改成功')
   } catch (error) {
     console.error('修改个人信息失败：', error)
@@ -134,34 +104,33 @@ const submitPassword = async () => {
     return
   }
 
+  if (passwordForm.newPassword.length < 6) {
+    ElMessage.warning('新密码不能少于 6 位')
+    return
+  }
+
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
     ElMessage.warning('两次输入的新密码不一致')
     return
   }
 
   try {
-    if (!USE_MOCK) {
-      await changeDoctorPassword({
-        oldPassword: passwordForm.oldPassword,
-        newPassword: passwordForm.newPassword,
-      })
-    }
+    await changeDoctorPassword({
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword,
+    })
 
     passwordForm.oldPassword = ''
     passwordForm.newPassword = ''
     passwordForm.confirmPassword = ''
 
-    ElMessage.success('密码修改成功')
+    ElMessage.success('密码修改成功，请重新登录')
   } catch (error) {
     console.error('修改密码失败：', error)
   }
 }
 
 const loadSchedules = async () => {
-  if (USE_MOCK) {
-    return
-  }
-
   try {
     const result = await getDoctorSchedules({
       month: scheduleMonth.value,
@@ -174,10 +143,6 @@ const loadSchedules = async () => {
 }
 
 const loadServiceRecords = async () => {
-  if (USE_MOCK) {
-    return
-  }
-
   try {
     const result = await getDoctorServiceRecords({
       pageNum: 1,
@@ -187,6 +152,26 @@ const loadServiceRecords = async () => {
     serviceData.value = result.data.list || []
   } catch (error) {
     console.error('获取服务记录失败：', error)
+  }
+}
+
+const loadPerformance = async () => {
+  try {
+    const [startDate, endDate] = performanceRange.value || []
+
+    const result = await getDoctorPerformance({
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+    })
+
+    performanceData.value = result.data || {
+      serviceCount: 0,
+      elderCount: 0,
+      followUpCount: 0,
+      avgRating: 0,
+    }
+  } catch (error) {
+    console.error('获取绩效失败：', error)
   }
 }
 
@@ -234,6 +219,7 @@ const serviceTypeText = (type) => {
 loadProfile()
 loadSchedules()
 loadServiceRecords()
+loadPerformance()
 </script>
 
 <template>
@@ -241,7 +227,7 @@ loadServiceRecords()
     <div class="page-header">
       <div>
         <h2>个人中心</h2>
-        <p>管理个人资料、密码、排班及服务记录</p>
+        <p>管理个人资料、密码、排班、服务记录及绩效</p>
       </div>
     </div>
 
@@ -348,7 +334,7 @@ loadServiceRecords()
       <el-tab-pane label="服务记录" name="service">
         <el-card shadow="never">
           <el-table :data="serviceData" style="width: 100%">
-            <el-table-column prop="elderName" label="老人" width="120" />
+            <el-table-column prop="elderId" label="老人ID" width="100" />
 
             <el-table-column label="服务类型" width="140">
               <template #default="{ row }">
@@ -372,6 +358,54 @@ loadServiceRecords()
 
             <el-table-column prop="rating" label="评价" width="100" />
           </el-table>
+        </el-card>
+      </el-tab-pane>
+
+      <!-- 我的绩效 -->
+      <el-tab-pane label="我的绩效" name="performance">
+        <el-card shadow="never">
+          <div class="toolbar">
+            <el-date-picker
+              v-model="performanceRange"
+              type="daterange"
+              value-format="YYYY-MM-DD"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            />
+
+            <el-button type="primary" @click="loadPerformance"> 查询 </el-button>
+          </div>
+
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="6">
+              <div class="stat-card">
+                <div class="stat-value">{{ performanceData.serviceCount }}</div>
+                <div class="stat-label">服务次数</div>
+              </div>
+            </el-col>
+
+            <el-col :xs="12" :sm="6">
+              <div class="stat-card">
+                <div class="stat-value">{{ performanceData.elderCount }}</div>
+                <div class="stat-label">服务老人数</div>
+              </div>
+            </el-col>
+
+            <el-col :xs="12" :sm="6">
+              <div class="stat-card">
+                <div class="stat-value">{{ performanceData.followUpCount }}</div>
+                <div class="stat-label">随访次数</div>
+              </div>
+            </el-col>
+
+            <el-col :xs="12" :sm="6">
+              <div class="stat-card">
+                <div class="stat-value">{{ performanceData.avgRating }}</div>
+                <div class="stat-label">平均评分</div>
+              </div>
+            </el-col>
+          </el-row>
         </el-card>
       </el-tab-pane>
     </el-tabs>
@@ -408,5 +442,24 @@ loadServiceRecords()
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 26px 10px;
+  background: #f6f9fc;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-value {
+  font-size: 30px;
+  font-weight: 600;
+  color: #409eff;
+}
+
+.stat-label {
+  margin-top: 8px;
+  color: #909399;
 }
 </style>

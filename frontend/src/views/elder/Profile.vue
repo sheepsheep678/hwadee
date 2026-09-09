@@ -4,72 +4,36 @@ import { ElMessage } from 'element-plus'
 
 import { getMyProfile, updateMyProfile } from '@/api/elderUser'
 
-const USE_MOCK = true
-
 const editMode = ref(false)
+const loading = ref(false)
 
 // 基本档案
 const profile = reactive({
-  id: 10001,
-  elderNo: 'ELD20260001',
-  name: '张建国',
+  id: null,
+  elderNo: '',
+  name: '',
   gender: 1,
-  birthDate: '1952-03-18',
-  idCard: '510***********1234',
-  phone: '13800138001',
+  birthDate: '',
+  idCard: '',
+  phone: '',
   livingType: 1,
   maritalStatus: 1,
-  education: '高中',
-  address: '成都市成华区',
-  medicareNo: 'YB20260001',
-  govAidType: '高龄补贴',
+  education: '',
+  address: '',
+  medicareNo: '',
+  govAidType: '',
   photoUrl: '',
   status: 1,
 })
 
 // 健康档案
-const healthRecords = ref([
-  {
-    id: 1,
-    recordType: 1,
-    diseaseName: '高血压',
-    icdCode: 'I10',
-    diagnoseDate: '2018-05-10',
-    hospital: '成都市第二人民医院',
-    detail: '长期血压偏高，需定期监测',
-    medication: '氨氯地平',
-  },
-  {
-    id: 2,
-    recordType: 2,
-    diseaseName: '青霉素过敏',
-    icdCode: '-',
-    diagnoseDate: '2005-08-12',
-    hospital: '成都市人民医院',
-    detail: '使用青霉素后出现皮疹',
-    medication: '-',
-  },
-])
+const healthRecords = ref([])
 
 // 家属联系人
-const familyContacts = ref([
-  {
-    id: 1,
-    name: '张伟',
-    relation: '儿子',
-    phone: '13900139001',
-    isPrimary: 1,
-    address: '成都市锦江区',
-  },
-  {
-    id: 2,
-    name: '张丽',
-    relation: '女儿',
-    phone: '13900139002',
-    isPrimary: 0,
-    address: '成都市武侯区',
-  },
-])
+const familyContacts = ref([])
+
+// 重点标签
+const tags = ref([])
 
 // 可编辑表单
 const editForm = reactive({
@@ -79,12 +43,29 @@ const editForm = reactive({
 })
 
 const loadProfile = async () => {
-  if (USE_MOCK) {
+  loading.value = true
+
+  // 从登录信息里取老人档案ID
+  let elderId = null
+
+  const raw = localStorage.getItem('elderUserInfo')
+
+  if (raw) {
+    try {
+      elderId = JSON.parse(raw).elderId
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  if (!elderId) {
+    ElMessage.warning('未能获取老人档案信息，请重新登录')
+    loading.value = false
     return
   }
 
   try {
-    const result = await getMyProfile()
+    const result = await getMyProfile(elderId)
 
     if (result.data) {
       Object.assign(profile, result.data)
@@ -92,9 +73,13 @@ const loadProfile = async () => {
       healthRecords.value = result.data.healthRecords || []
 
       familyContacts.value = result.data.familyContacts || []
+
+      tags.value = result.data.tags || []
     }
   } catch (error) {
     console.error('获取老人档案失败：', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -155,16 +140,6 @@ const handleSave = async () => {
   }
 
   try {
-    if (USE_MOCK) {
-      profile.phone = editForm.phone
-      profile.address = editForm.address
-      profile.photoUrl = editForm.photoUrl
-
-      ElMessage.success('档案修改成功')
-      editMode.value = false
-      return
-    }
-
     await updateMyProfile({
       phone: editForm.phone,
       address: editForm.address,
@@ -197,10 +172,16 @@ loadProfile()
     </div>
 
     <!-- 基本档案 -->
-    <el-card shadow="never" class="section-card">
+    <el-card v-loading="loading" shadow="never" class="section-card">
       <template #header>
         <div class="card-title">基本档案</div>
       </template>
+
+      <div v-if="tags.length > 0" class="tags-box">
+        <el-tag v-for="(tag, index) in tags" :key="index" type="warning" class="tag-item">
+          {{ tag }}
+        </el-tag>
+      </div>
 
       <div v-if="!editMode">
         <el-descriptions :column="2" border>
@@ -375,5 +356,13 @@ loadProfile()
 
 .edit-tip {
   margin-bottom: 24px;
+}
+
+.tags-box {
+  margin-bottom: 16px;
+}
+
+.tag-item {
+  margin-right: 8px;
 }
 </style>

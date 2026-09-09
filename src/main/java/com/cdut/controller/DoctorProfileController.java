@@ -1,14 +1,14 @@
 package com.cdut.controller;
 
-import com.cdut.common.PageInfo;
-import com.cdut.common.Result;
 import com.cdut.dto.DoctorPerformanceDTO;
 import com.cdut.dto.DoctorSaveDTO;
 import com.cdut.dto.PasswordChangeDTO;
 import com.cdut.dto.ServiceRecordQueryDTO;
-import com.cdut.entity.DoctorAccount;
-import com.cdut.entity.DoctorSchedule;
-import com.cdut.entity.ServiceRecord;
+import com.cdut.pojo.DoctorAccount;
+import com.cdut.pojo.DoctorSchedule;
+import com.cdut.pojo.PageResult;
+import com.cdut.pojo.Result;
+import com.cdut.pojo.ServiceRecord;
 import com.cdut.service.DoctorProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -37,14 +37,14 @@ public class DoctorProfileController {
     @PutMapping("/me")
     public Result<Void> updateMe(@RequestBody DoctorSaveDTO dto) {
         doctorProfileService.updateMe(dto);
-        return Result.success();
+        return Result.success("修改成功", null);
     }
 
     /** 修改密码 */
     @PutMapping("/password")
     public Result<Void> changePassword(@RequestBody @Validated PasswordChangeDTO dto) {
         doctorProfileService.changePassword(dto);
-        return Result.success();
+        return Result.success("修改成功，请重新登录", null);
     }
 
     /** 我的排班（按月） */
@@ -55,7 +55,7 @@ public class DoctorProfileController {
 
     /** 我的服务记录 */
     @GetMapping("/service-records")
-    public Result<PageInfo<ServiceRecord>> serviceRecords(ServiceRecordQueryDTO query) {
+    public Result<PageResult<ServiceRecord>> serviceRecords(ServiceRecordQueryDTO query) {
         return Result.success(doctorProfileService.serviceRecords(query));
     }
 

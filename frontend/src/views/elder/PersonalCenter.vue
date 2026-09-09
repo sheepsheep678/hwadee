@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 import {
@@ -7,20 +7,25 @@ import {
   changeElderPassword,
   getElderMessages,
   readElderMessage,
+  markAllElderMessagesRead,
   getUnreadMessageCount,
 } from '@/api/elderUser'
-
-const USE_MOCK = true
 
 const activeTab = ref('account')
 
 const accountInfo = reactive({
-  id: 50001,
-  accountNo: 'ELD20260001',
-  bindPhone: '13800138001',
+  id: null,
+  accountNo: '',
+  bindPhone: '',
   authStatus: 1,
   accountStatus: 1,
   registerChannel: 1,
+  elderId: null,
+  elderNo: '',
+  name: '',
+  idCard: '',
+  phone: '',
+  photoUrl: '',
 })
 
 const passwordForm = reactive({
@@ -29,36 +34,9 @@ const passwordForm = reactive({
   confirmPassword: '',
 })
 
-const messages = ref([
-  {
-    id: 1,
-    msgType: 1,
-    title: '健康服务提醒',
-    content: '请注意按时测量血压，并记录每日数据。',
-    isRead: 0,
-    createTime: '2026-09-08 09:00',
-  },
-  {
-    id: 2,
-    msgType: 2,
-    title: '服务提醒',
-    content: '您的家庭医生将于明日上午进行上门随访。',
-    isRead: 0,
-    createTime: '2026-09-07 16:30',
-  },
-  {
-    id: 3,
-    msgType: 1,
-    title: '系统通知',
-    content: '您的个人健康档案已更新。',
-    isRead: 1,
-    createTime: '2026-09-06 10:20',
-  },
-])
-
-const unreadCount = computed(() => {
-  return messages.value.filter((item) => item.isRead === 0).length
-})
+const messages = ref([])
+const unreadCount = ref(0)
+const messagesLoading = ref(false)
 
 const authStatusText = (status) => {
   const map = {
@@ -93,7 +71,7 @@ const registerChannelText = (channel) => {
 const messageTypeText = (type) => {
   const map = {
     1: '系统公告',
-    2: '服务提醒',
+    2: '工单提醒',
     3: '审核提醒',
   }
 
@@ -101,10 +79,6 @@ const messageTypeText = (type) => {
 }
 
 const loadAccount = async () => {
-  if (USE_MOCK) {
-    return
-  }
-
   try {
     const result = await getMyAccount()
     Object.assign(accountInfo, result.data || {})
@@ -114,9 +88,7 @@ const loadAccount = async () => {
 }
 
 const loadMessages = async () => {
-  if (USE_MOCK) {
-    return
-  }
+  messagesLoading.value = true
 
   try {
     const result = await getElderMessages({
@@ -127,17 +99,15 @@ const loadMessages = async () => {
     messages.value = result.data.list || []
   } catch (error) {
     console.error('获取消息失败：', error)
+  } finally {
+    messagesLoading.value = false
   }
 }
 
 const loadUnreadCount = async () => {
-  if (USE_MOCK) {
-    return
-  }
-
   try {
     const result = await getUnreadMessageCount()
-    console.log('未读数量：', result.data)
+    unreadCount.value = result.data || 0
   } catch (error) {
     console.error('获取未读消息数量失败：', error)
   }
@@ -165,18 +135,16 @@ const submitPassword = async () => {
   }
 
   try {
-    if (!USE_MOCK) {
-      await changeElderPassword({
-        oldPassword: passwordForm.oldPassword,
-        newPassword: passwordForm.newPassword,
-      })
-    }
+    await changeElderPassword({
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword,
+    })
 
     passwordForm.oldPassword = ''
     passwordForm.newPassword = ''
     passwordForm.confirmPassword = ''
 
-    ElMessage.success('密码修改成功')
+    ElMessage.success('密码修改成功，请重新登录')
   } catch (error) {
     console.error('修改密码失败：', error)
   }
@@ -188,14 +156,28 @@ const handleRead = async (message) => {
   }
 
   try {
-    if (!USE_MOCK) {
-      await readElderMessage(message.id)
-    }
+    await readElderMessage(message.id)
 
     message.isRead = 1
+    unreadCount.value = Math.max(0, unreadCount.value - 1)
     ElMessage.success('已标记为已读')
   } catch (error) {
     console.error('标记消息已读失败：', error)
+  }
+}
+
+const handleReadAll = async () => {
+  try {
+    await markAllElderMessagesRead()
+
+    messages.value.forEach((item) => {
+      item.isRead = 1
+    })
+
+    unreadCount.value = 0
+    ElMessage.success('全部消息已标记为已读')
+  } catch (error) {
+    console.error('标记全部已读失败：', error)
   }
 }
 
@@ -222,8 +204,16 @@ loadUnreadCount()
               {{ accountInfo.accountNo }}
             </el-descriptions-item>
 
+            <el-descriptions-item label="姓名">
+              {{ accountInfo.name || '-' }}
+            </el-descriptions-item>
+
             <el-descriptions-item label="绑定手机号">
-              {{ accountInfo.bindPhone }}
+              {{ accountInfo.bindPhone || accountInfo.phone || '-' }}
+            </el-descriptions-item>
+
+            <el-descriptions-item label="身份证号">
+              {{ accountInfo.idCard || '-' }}
             </el-descriptions-item>
 
             <el-descriptions-item label="审核状态">
@@ -278,37 +268,44 @@ loadUnreadCount()
         </template>
 
         <el-card shadow="never">
-          <div
-            v-for="message in messages"
-            :key="message.id"
-            class="message-item"
-            :class="{ unread: message.isRead === 0 }"
-            @click="handleRead(message)"
-          >
-            <div class="message-top">
-              <div>
-                <el-tag size="small" :type="message.isRead === 0 ? 'danger' : 'info'">
-                  {{ messageTypeText(message.msgType) }}
-                </el-tag>
-
-                <strong class="message-title">
-                  {{ message.title }}
-                </strong>
-              </div>
-
-              <span class="message-time">
-                {{ message.createTime }}
-              </span>
-            </div>
-
-            <p class="message-content">
-              {{ message.content }}
-            </p>
-
-            <span v-if="message.isRead === 0" class="unread-tip"> 点击标记为已读 </span>
+          <div class="message-toolbar">
+            <el-button type="primary" plain @click="handleReadAll"> 全部已读 </el-button>
+            <el-button @click="loadMessages"> 刷新 </el-button>
           </div>
 
-          <el-empty v-if="messages.length === 0" description="暂无消息" />
+          <div v-loading="messagesLoading">
+            <div
+              v-for="message in messages"
+              :key="message.id"
+              class="message-item"
+              :class="{ unread: message.isRead === 0 }"
+              @click="handleRead(message)"
+            >
+              <div class="message-top">
+                <div>
+                  <el-tag size="small" :type="message.isRead === 0 ? 'danger' : 'info'">
+                    {{ messageTypeText(message.msgType) }}
+                  </el-tag>
+
+                  <strong class="message-title">
+                    {{ message.title }}
+                  </strong>
+                </div>
+
+                <span class="message-time">
+                  {{ message.createTime }}
+                </span>
+              </div>
+
+              <p class="message-content">
+                {{ message.content }}
+              </p>
+
+              <span v-if="message.isRead === 0" class="unread-tip"> 点击标记为已读 </span>
+            </div>
+
+            <el-empty v-if="!messagesLoading && messages.length === 0" description="暂无消息" />
+          </div>
         </el-card>
       </el-tab-pane>
     </el-tabs>
@@ -343,6 +340,10 @@ loadUnreadCount()
 
 .message-badge {
   margin-left: 8px;
+}
+
+.message-toolbar {
+  margin-bottom: 16px;
 }
 
 .message-item {

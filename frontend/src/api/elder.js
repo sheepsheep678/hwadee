@@ -42,3 +42,12 @@ export function deleteElderProfile(id) {
     method: 'delete',
   })
 }
+
+// 批量导出老人档案，返回文件地址
+export function exportElderProfiles(params) {
+  return request({
+    url: '/doctor/elder/profiles/export',
+    method: 'post',
+    params,
+  })
+}

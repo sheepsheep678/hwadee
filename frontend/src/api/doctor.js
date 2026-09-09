@@ -9,6 +9,15 @@ export function doctorLogin(data) {
   })
 }
 
+// 医生注册（入驻申请）
+export function doctorRegister(data) {
+  return request({
+    url: '/doctor/auth/register',
+    method: 'post',
+    data,
+  })
+}
+
 // 医生退出登录
 export function doctorLogout() {
   return request({

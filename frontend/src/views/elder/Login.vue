@@ -1,16 +1,30 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { elderLogin, elderRegister } from '@/api/elderUser'
 
 const router = useRouter()
+const loading = ref(false)
 
 const loginForm = reactive({
   account: '',
   password: '',
 })
 
-const handleLogin = () => {
+const registerVisible = ref(false)
+const registerLoading = ref(false)
+
+const registerForm = reactive({
+  name: '',
+  idCard: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+  registerChannel: 1,
+})
+
+const handleLogin = async () => {
   if (!loginForm.account) {
     ElMessage.warning('请输入账号')
     return
@@ -21,20 +35,86 @@ const handleLogin = () => {
     return
   }
 
-  // 临时模拟登录
-  localStorage.setItem('elderAccessToken', 'elder-dev-token')
+  loading.value = true
 
-  localStorage.setItem(
-    'elderUserInfo',
-    JSON.stringify({
-      userId: 50001,
-      realName: '张建国',
-      userType: 3,
-    }),
-  )
+  try {
+    const result = await elderLogin({
+      account: loginForm.account,
+      password: loginForm.password,
+    })
 
-  ElMessage.success('登录成功')
-  router.push('/elder')
+    const data = result.data
+
+    localStorage.setItem('elderAccessToken', data.accessToken)
+    localStorage.setItem('elderUserInfo', JSON.stringify(data.userInfo || {}))
+
+    ElMessage.success('登录成功')
+    router.push('/elder')
+  } catch (error) {
+    // 错误提示已由拦截器处理
+  } finally {
+    loading.value = false
+  }
+}
+
+const openRegister = () => {
+  Object.assign(registerForm, {
+    name: '',
+    idCard: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    registerChannel: 1,
+  })
+
+  registerVisible.value = true
+}
+
+const handleRegister = async () => {
+  if (!registerForm.name) {
+    ElMessage.warning('请输入姓名')
+    return
+  }
+
+  if (!registerForm.idCard) {
+    ElMessage.warning('请输入身份证号')
+    return
+  }
+
+  if (!registerForm.phone) {
+    ElMessage.warning('请输入手机号')
+    return
+  }
+
+  if (!registerForm.password || registerForm.password.length < 6) {
+    ElMessage.warning('密码不能少于 6 位')
+    return
+  }
+
+  if (registerForm.password !== registerForm.confirmPassword) {
+    ElMessage.warning('两次输入的密码不一致')
+    return
+  }
+
+  registerLoading.value = true
+
+  try {
+    await elderRegister({
+      name: registerForm.name,
+      idCard: registerForm.idCard,
+      phone: registerForm.phone,
+      password: registerForm.password,
+      confirmPassword: registerForm.confirmPassword,
+      registerChannel: registerForm.registerChannel,
+    })
+
+    ElMessage.success('注册成功，请等待审核')
+    registerVisible.value = false
+  } catch (error) {
+    // 错误提示已由拦截器处理
+  } finally {
+    registerLoading.value = false
+  }
 }
 </script>
 
@@ -60,11 +140,58 @@ const handleLogin = () => {
           />
         </el-form-item>
 
-        <el-button type="primary" class="login-button" @click="handleLogin"> 登录 </el-button>
+        <el-button type="primary" class="login-button" :loading="loading" @click="handleLogin">
+          登录
+        </el-button>
       </el-form>
+
+      <div class="link-box">
+        <el-link type="primary" @click="openRegister">老人注册</el-link>
+        <el-link type="info" @click="router.push('/doctor/login')">医生端登录</el-link>
+        <el-link type="info" @click="router.push('/')">返回选择</el-link>
+      </div>
 
       <div class="footer-text">智慧养老 · 健康陪伴</div>
     </div>
+
+    <el-dialog v-model="registerVisible" title="老人注册" width="560px">
+      <el-form :model="registerForm" label-width="100px">
+        <el-form-item label="姓名">
+          <el-input v-model="registerForm.name" />
+        </el-form-item>
+
+        <el-form-item label="身份证号">
+          <el-input v-model="registerForm.idCard" />
+        </el-form-item>
+
+        <el-form-item label="手机号">
+          <el-input v-model="registerForm.phone" />
+        </el-form-item>
+
+        <el-form-item label="注册渠道">
+          <el-select v-model="registerForm.registerChannel" style="width: 100%">
+            <el-option label="自助注册" :value="1" />
+            <el-option label="家属代注册" :value="2" />
+            <el-option label="机构录入" :value="3" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="密码">
+          <el-input v-model="registerForm.password" type="password" show-password />
+        </el-form-item>
+
+        <el-form-item label="确认密码">
+          <el-input v-model="registerForm.confirmPassword" type="password" show-password />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="registerVisible = false">取消</el-button>
+        <el-button type="primary" :loading="registerLoading" @click="handleRegister">
+          注册
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,6 +232,12 @@ const handleLogin = () => {
 
 .login-button {
   width: 100%;
+}
+
+.link-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
 }
 
 .footer-text {

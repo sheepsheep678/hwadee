@@ -1,10 +1,8 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 import { getDoctorDevices, getDoctorDeviceDetail } from '@/api/device'
-
-const USE_MOCK = true
 
 const queryForm = reactive({
   deviceName: '',
@@ -14,79 +12,32 @@ const queryForm = reactive({
 
 const pageNum = ref(1)
 const pageSize = ref(10)
+const total = ref(0)
+const loading = ref(false)
 
 const detailVisible = ref(false)
 const currentDevice = ref({})
 
-const tableData = ref([
-  {
-    id: 1,
-    deviceSn: 'DEV20260001',
-    deviceName: '智能健康手环',
-    deviceType: 2,
-    model: 'HB-2026A',
-    brand: '华康',
-    onlineStatus: 1,
-    batteryLevel: 86,
-    status: 1,
-    elderName: '张建国',
-  },
-  {
-    id: 2,
-    deviceSn: 'DEV20260002',
-    deviceName: '智能床垫',
-    deviceType: 1,
-    model: 'SM-100',
-    brand: '安养',
-    onlineStatus: 1,
-    batteryLevel: 100,
-    status: 1,
-    elderName: '李桂芳',
-  },
-  {
-    id: 3,
-    deviceSn: 'DEV20260003',
-    deviceName: '紧急呼叫器',
-    deviceType: 3,
-    model: 'SOS-X1',
-    brand: '康护',
-    onlineStatus: 0,
-    batteryLevel: 23,
-    status: 1,
-    elderName: '王国强',
-  },
-])
-
-const filteredData = computed(() => {
-  return tableData.value.filter((item) => {
-    const matchName = !queryForm.deviceName || item.deviceName.includes(queryForm.deviceName)
-
-    const matchType = !queryForm.deviceType || item.deviceType === Number(queryForm.deviceType)
-
-    const matchOnline =
-      queryForm.onlineStatus === '' || item.onlineStatus === Number(queryForm.onlineStatus)
-
-    return matchName && matchType && matchOnline
-  })
-})
+const tableData = ref([])
 
 const loadData = async () => {
-  if (USE_MOCK) {
-    return
-  }
+  loading.value = true
 
   try {
     const result = await getDoctorDevices({
       pageNum: pageNum.value,
       pageSize: pageSize.value,
-      deviceName: queryForm.deviceName,
-      deviceType: queryForm.deviceType,
-      onlineStatus: queryForm.onlineStatus,
+      deviceName: queryForm.deviceName || undefined,
+      deviceType: queryForm.deviceType || undefined,
+      onlineStatus: queryForm.onlineStatus === '' ? undefined : queryForm.onlineStatus,
     })
 
     tableData.value = result.data.list || []
+    total.value = result.data.total || 0
   } catch (error) {
     console.error('查询设备失败：', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -127,18 +78,6 @@ const handleReset = () => {
 }
 
 const handleDetail = async (row) => {
-  if (USE_MOCK) {
-    currentDevice.value = {
-      ...row,
-      purchaseDate: '2026-05-12',
-      price: 899,
-      orgName: '成都市智慧养老服务中心',
-    }
-
-    detailVisible.value = true
-    return
-  }
-
   try {
     const result = await getDoctorDeviceDetail(row.id)
 
@@ -149,6 +88,12 @@ const handleDetail = async (row) => {
     console.error(error)
   }
 }
+
+const handlePageChange = () => {
+  loadData()
+}
+
+loadData()
 </script>
 
 <template>
@@ -202,7 +147,7 @@ const handleDetail = async (row) => {
     </el-card>
 
     <el-card shadow="never">
-      <el-table :data="filteredData" style="width: 100%">
+      <el-table v-loading="loading" :data="tableData" style="width: 100%">
         <el-table-column prop="deviceSn" label="设备编号" width="150" />
 
         <el-table-column prop="deviceName" label="设备名称" width="150" />
@@ -229,7 +174,7 @@ const handleDetail = async (row) => {
 
         <el-table-column label="电量" width="160">
           <template #default="{ row }">
-            <el-progress :percentage="row.batteryLevel" :stroke-width="10" />
+            <el-progress :percentage="row.batteryLevel || 0" :stroke-width="10" />
           </template>
         </el-table-column>
 
@@ -252,7 +197,8 @@ const handleDetail = async (row) => {
           v-model:page-size="pageSize"
           background
           layout="total, prev, pager, next"
-          :total="filteredData.length"
+          :total="total"
+          @current-change="handlePageChange"
         />
       </div>
     </el-card>
@@ -280,7 +226,11 @@ const handleDetail = async (row) => {
         </el-descriptions-item>
 
         <el-descriptions-item label="绑定老人">
-          {{ currentDevice.elderName }}
+          {{ currentDevice.elderName || '-' }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="绑定老人电话">
+          {{ currentDevice.elderPhone || '-' }}
         </el-descriptions-item>
 
         <el-descriptions-item label="在线状态">
@@ -299,8 +249,8 @@ const handleDetail = async (row) => {
           {{ currentDevice.price ? `¥${currentDevice.price}` : '-' }}
         </el-descriptions-item>
 
-        <el-descriptions-item label="所属机构" :span="2">
-          {{ currentDevice.orgName || '-' }}
+        <el-descriptions-item label="所属机构ID" :span="2">
+          {{ currentDevice.orgId || '-' }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>

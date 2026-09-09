@@ -62,6 +62,14 @@ const handleLogout = () => {
           <span>设备管理</span>
         </el-menu-item>
 
+        <el-menu-item index="/doctor/assessments">
+          <span>评估管理</span>
+        </el-menu-item>
+
+        <el-menu-item index="/doctor/focus">
+          <span>重点随访</span>
+        </el-menu-item>
+
         <el-menu-item index="/doctor/profile">
           <span>个人中心</span>
         </el-menu-item>

@@ -1,10 +1,10 @@
 package com.cdut.service;
 
-import com.cdut.common.PageInfo;
 import com.cdut.dto.AssessmentReportQueryDTO;
 import com.cdut.dto.AssessmentSubmitDTO;
-import com.cdut.entity.AssessmentReport;
-import com.cdut.entity.AssessmentTemplate;
+import com.cdut.pojo.AssessmentReport;
+import com.cdut.pojo.AssessmentTemplate;
+import com.cdut.pojo.PageResult;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface AssessmentService {
     AssessmentReport submit(AssessmentSubmitDTO dto);
 
     /** 评估报告分页查询 */
-    PageInfo<AssessmentReport> page(AssessmentReportQueryDTO query);
+    PageResult<AssessmentReport> page(AssessmentReportQueryDTO query);
 
     /** 评估报告详情 */
     AssessmentReport detail(Long id);

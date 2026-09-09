@@ -102,15 +102,6 @@
         </dependency>
 
 
-        <!-- MyBatis-Plus SQL 解析器（分页、多租户等功能依赖） -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>3.5.9</version>
-        </dependency>
-
-
-
     </dependencies>
 
     <build>

@@ -16,11 +16,8 @@ public class FollowUpPlanSaveDTO implements Serializable {
     @NotNull(message = "老人ID不能为空")
     private Long elderId;
 
-    /** 计划名称 */
-    private String planName;
-
-    /** 随访类型 */
-    private Integer followUpType;
+    /** 计划类型：1-电话 2-上门 3-远程问诊 */
+    private Integer planType;
 
     /** 开始日期 */
     private LocalDate startDate;
@@ -28,13 +25,10 @@ public class FollowUpPlanSaveDTO implements Serializable {
     /** 结束日期 */
     private LocalDate endDate;
 
-    /** 随访频率 */
+    /** 随访频次 */
     private String frequency;
 
-    /** 随访内容 */
-    private String content;
-
-    /** 状态：1-进行中 0-已结束 */
+    /** 执行状态：1-进行中 2-已完成 3-已终止 */
     private Integer status;
 
 }

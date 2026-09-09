@@ -13,9 +13,6 @@ public class DoctorSaveDTO implements Serializable {
     /** 姓名 */
     private String name;
 
-    /** 头像 */
-    private String avatar;
-
     /** 职称 */
     private String title;
 

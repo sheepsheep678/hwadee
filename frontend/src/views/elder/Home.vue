@@ -1,7 +1,22 @@
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+const realName = computed(() => {
+  const raw = localStorage.getItem('elderUserInfo')
+
+  if (!raw) {
+    return ''
+  }
+
+  try {
+    return JSON.parse(raw).realName || ''
+  } catch {
+    return ''
+  }
+})
 
 const cards = [
   {
@@ -25,7 +40,7 @@ const cards = [
 <template>
   <div>
     <div class="welcome">
-      <h2>您好，欢迎回来</h2>
+      <h2>{{ realName ? `${realName}，您好，欢迎回来` : '您好，欢迎回来' }}</h2>
       <p>这里可以查看您的健康档案和设备信息</p>
     </div>
 

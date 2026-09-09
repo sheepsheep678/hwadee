@@ -7,7 +7,6 @@ import com.cdut.dto.ElderProfileUpdateDTO;
 import com.cdut.pojo.*;
 import com.cdut.service.ProfileService;
 import com.github.pagehelper.PageInfo;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +18,11 @@ public class ProfileController {
     @Autowired
     private ProfileService profileService;
     @GetMapping("/profile")
-    public Result<ElderProfileDetailDTO> queryElderProfile(HttpServletRequest request){
-        // 1. 从 request 中获取拦截器解析并放入的 userId
-        String userId = (String) request.getAttribute("currentUserId");
-
-        // 如果没有取到，说明拦截器放行但没设置好，或者token里没有存这个信息
-        if (userId == null) {
+    public Result<ElderProfileDetailDTO> queryElderProfile(@RequestParam("id") Long id){
+        if (id == null) {
             return Result.error("用户信息获取失败");
         }
-        return profileService.getElderProfile(Long.valueOf(userId));
+        return profileService.getElderProfile(id);
     }
     @GetMapping("/profile/page")
     public PageResult<ElderProfileQueryDTO> list(@RequestParam(defaultValue = "1") int pageNum,

@@ -1,9 +1,9 @@
 package com.cdut.controller;
 
-import com.cdut.common.PageInfo;
-import com.cdut.common.Result;
 import com.cdut.dto.DeviceQueryDTO;
-import com.cdut.entity.DeviceInfo;
+import com.cdut.pojo.DeviceInfo;
+import com.cdut.pojo.PageResult;
+import com.cdut.pojo.Result;
 import com.cdut.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class DoctorDeviceController {
 
     /** 分页查看设备 */
     @GetMapping
-    public Result<PageInfo<DeviceInfo>> page(DeviceQueryDTO query) {
+    public Result<PageResult<DeviceInfo>> page(DeviceQueryDTO query) {
         return Result.success(deviceService.page(query));
     }
 

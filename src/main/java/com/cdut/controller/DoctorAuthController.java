@@ -1,9 +1,9 @@
 package com.cdut.controller;
 
-import com.cdut.common.Result;
 import com.cdut.dto.DoctorLoginDTO;
 import com.cdut.dto.DoctorRegisterDTO;
 import com.cdut.dto.LoginRespDTO;
+import com.cdut.pojo.Result;
 import com.cdut.service.DoctorAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -32,14 +32,14 @@ public class DoctorAuthController {
     @PostMapping("/logout")
     public Result<Void> logout() {
         doctorAuthService.logout();
-        return Result.success();
+        return Result.success("退出成功", null);
     }
 
     /** 医生注册（入驻申请） */
     @PostMapping("/register")
     public Result<Void> register(@RequestBody @Validated DoctorRegisterDTO dto) {
         doctorAuthService.register(dto);
-        return Result.success();
+        return Result.success("注册成功，请等待审核", null);
     }
 
 }

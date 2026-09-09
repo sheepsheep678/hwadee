@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @Data
 public class DoctorQualificationDTO implements Serializable {
 
-    /** 证书类型 */
-    private String certType;
+    /** 证书类型：1-执业证 2-职称证 */
+    private Integer certType;
 
     /** 证书编号 */
     private String certNo;

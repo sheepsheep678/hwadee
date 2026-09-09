@@ -8,7 +8,10 @@ const request = axios.create({
 
 request.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken')
+    // 老人端接口使用 elderAccessToken，其余（医生端等）使用 accessToken
+    const isElder = (config.url || '').startsWith('/elder')
+
+    const token = localStorage.getItem(isElder ? 'elderAccessToken' : 'accessToken')
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

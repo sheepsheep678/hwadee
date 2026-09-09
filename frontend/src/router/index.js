@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+// 登录方式选择页
+import LoginChoose from '@/views/LoginChoose.vue'
+
 // 医生端
 import DoctorLogin from '@/views/doctor/Login.vue'
 import DoctorLayout from '@/views/doctor/DoctorLayout.vue'
@@ -7,6 +10,8 @@ import DoctorDashboard from '@/views/doctor/Dashboard.vue'
 import ElderProfile from '@/views/doctor/ElderProfile.vue'
 import Device from '@/views/doctor/Device.vue'
 import Profile from '@/views/doctor/Profile.vue'
+import Assessment from '@/views/doctor/Assessment.vue'
+import Focus from '@/views/doctor/Focus.vue'
 
 // 老人端
 import ElderLogin from '@/views/elder/Login.vue'
@@ -20,10 +25,11 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
 
   routes: [
-    // 默认进入医生登录页
+    // 默认进入登录方式选择页
     {
       path: '/',
-      redirect: '/doctor/login',
+      name: 'login-choose',
+      component: LoginChoose,
     },
 
     // =========================
@@ -61,6 +67,18 @@ const router = createRouter({
           path: 'devices',
           name: 'doctor-devices',
           component: Device,
+        },
+
+        {
+          path: 'assessments',
+          name: 'doctor-assessments',
+          component: Assessment,
+        },
+
+        {
+          path: 'focus',
+          name: 'doctor-focus',
+          component: Focus,
         },
 
         {

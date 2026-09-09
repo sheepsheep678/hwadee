@@ -1,11 +1,11 @@
 package com.cdut.controller;
 
-import com.cdut.common.PageInfo;
-import com.cdut.common.Result;
 import com.cdut.dto.AssessmentReportQueryDTO;
 import com.cdut.dto.AssessmentSubmitDTO;
-import com.cdut.entity.AssessmentReport;
-import com.cdut.entity.AssessmentTemplate;
+import com.cdut.pojo.AssessmentReport;
+import com.cdut.pojo.AssessmentTemplate;
+import com.cdut.pojo.PageResult;
+import com.cdut.pojo.Result;
 import com.cdut.service.AssessmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +37,7 @@ public class DoctorAssessmentController {
 
     /** 评估报告分页查询 */
     @GetMapping("/reports")
-    public Result<PageInfo<AssessmentReport>> page(AssessmentReportQueryDTO query) {
+    public Result<PageResult<AssessmentReport>> page(AssessmentReportQueryDTO query) {
         return Result.success(assessmentService.page(query));
     }
 
@@ -51,7 +51,7 @@ public class DoctorAssessmentController {
     @DeleteMapping("/reports/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         assessmentService.delete(id);
-        return Result.success();
+        return Result.success("删除成功", null);
     }
 
 }
