@@ -1,29 +1,28 @@
 package com.cdut.dto;
 
-import com.cdut.entity.ElderProfile;
-import com.cdut.entity.ElderTag;
-import com.cdut.entity.FamilyContact;
-import com.cdut.entity.HealthRecord;
+import com.cdut.pojo.ElderProfile;
+import com.cdut.pojo.FamilyContact;
+import com.cdut.pojo.HealthRecord;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.List;
 
-/**
- * 老人档案详情（含健康档案、家属联系人、标签）
- */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ElderProfileDetailDTO extends ElderProfile implements Serializable {
+public class ElderProfileDetailDTO extends ElderProfile {
 
-    /** 健康档案 */
-    private List<HealthRecord> healthRecords;
+   // 健康档案列表
+   private List<HealthRecord> healthRecords;
 
-    /** 家属联系人 */
-    private List<FamilyContact> familyContacts;
+   // 家属联系人列表
+   private List<FamilyContact> familyContacts;
 
-    /** 标签 */
-    private List<ElderTag> tags;
+   // 已打标签名称
+   private List<String> tags;
 
 }

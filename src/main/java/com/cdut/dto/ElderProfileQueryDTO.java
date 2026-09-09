@@ -1,36 +1,21 @@
 package com.cdut.dto;
 
-import com.cdut.entity.ElderProfile;
+import com.cdut.pojo.ElderProfile;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
-/**
- * 老人档案分页查询条件（extends ElderProfile）
- */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ElderProfileQueryDTO extends ElderProfile implements Serializable {
+public class ElderProfileQueryDTO extends ElderProfile {
 
-    /** 当前页码 */
-    private Integer pageNum = 1;
 
-    /** 每页条数 */
-    private Integer pageSize = 10;
 
-    /** 标签ID（重点人群筛选） */
-    private Long tagId;
+   // 标签ID（重点人群筛选） /
 
-    public int safePageNum() {
-        return pageNum == null || pageNum < 1 ? 1 : pageNum;
-    }
-
-    public int safePageSize() {
-        if (pageSize == null || pageSize < 1) {
-            return 10;
-        }
-        return Math.min(pageSize, 100);
-    }
+   private Long tagId;
 
 }

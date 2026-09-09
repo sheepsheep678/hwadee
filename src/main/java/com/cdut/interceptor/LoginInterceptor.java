@@ -1,77 +1,103 @@
 package com.cdut.interceptor;
 
-import com.cdut.common.Result;
-import com.cdut.common.ResultCode;
-import com.cdut.util.JwtUtil;
-import com.cdut.util.LoginUser;
-import com.cdut.util.UserContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cdut.utils.JwtUtils;
+import com.cdut.utils.UserContext;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 
 /**
- * 登录鉴权 + 角色校验拦截器。
- * <p>除登录/注册外，所有请求需携带 {@code Authorization: Bearer {accessToken}}；</p>
- * <p>访问 /api/doctor/** 的接口仅允许 userType=2（医生）角色。</p>
+ * 登录拦截器：校验 JWT + 端隔离 + 写入 UserContext
+ *
+ * <p>端隔离规则（按路径前缀）：
+ * <pre>
+ *   /api/admin/**  -> userType 必须为 1
+ *   /api/doctor/** -> userType 必须为 2
+ *   /api/elder/**  -> userType 必须为 3
+ * </pre>
+ * 放行的认证路径在 WebConfig 里配置（各端的 auth 路径）。
  */
 @Component
-@RequiredArgsConstructor
 public class LoginInterceptor implements HandlerInterceptor {
 
-    private static final String TOKEN_PREFIX = "Bearer ";
-
-    private final JwtUtil jwtUtil;
-    private final ObjectMapper objectMapper;
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // CORS 预检请求直接放行
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+        // 静态资源 / 跨域预检等非 Controller 请求直接放行
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
 
         String token = resolveToken(request);
-        LoginUser user = token == null ? null : jwtUtil.parseToken(token);
-        if (user == null) {
-            writeUnauthorized(response, "未登录或登录已过期");
-            return false;
+        if (token == null) {
+            return unauthorized(response, "请先登录");
         }
 
-        // 医生端接口仅允许医生角色(userType=2)访问
-        if (request.getRequestURI().startsWith("/api/doctor/") && (user.getUserType() == null || user.getUserType() != 2)) {
-            writeUnauthorized(response, "无权限访问");
-            return false;
-        }
+        try {
+            Claims claims = jwtUtils.parseToken(token);
+            Long userId = Long.valueOf(claims.get("userId", String.class));
+            Integer userType = Integer.valueOf(claims.get("userType", String.class));
 
-        UserContext.set(user);
-        return true;
+            // 端隔离：医生 token 不能调老人接口，反之亦然
+            Integer required = requiredUserType(request.getRequestURI());
+            if (required != null && !required.equals(userType)) {
+                return unauthorized(response, "无权访问该端接口");
+            }
+
+            UserContext.set(userId, userType);
+            return true;
+        } catch (Exception e) {
+            return unauthorized(response, "登录已失效，请重新登录");
+        }
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) {
+        // 必须清理，否则线程池复用会串号
         UserContext.clear();
     }
 
+    /** 从 Authorization 头取 token，兼容 "Bearer " 前缀 */
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (StringUtils.hasText(header) && header.startsWith(TOKEN_PREFIX)) {
-            return header.substring(TOKEN_PREFIX.length());
+        if (header == null || header.isBlank()) {
+            return null;
+        }
+        if (header.startsWith("Bearer ")) {
+            header = header.substring(7).trim();
+        }
+        return header.isEmpty() ? null : header;
+    }
+
+    /** 路径前缀 -> 允许的 userType，返回 null 表示不限制 */
+    private Integer requiredUserType(String uri) {
+        if (uri.startsWith("/api/admin/")) {
+            return JwtUtils.USER_TYPE_ADMIN;
+        }
+        if (uri.startsWith("/api/doctor/")) {
+            return JwtUtils.USER_TYPE_DOCTOR;
+        }
+        if (uri.startsWith("/api/elder/")) {
+            return JwtUtils.USER_TYPE_ELDER;
         }
         return null;
     }
 
-    private void writeUnauthorized(HttpServletResponse response, String message) throws Exception {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write(objectMapper.writeValueAsString(Result.error(ResultCode.ERROR, message)));
+    /** 返回统一的 Result JSON（而不是纯文本，否则前端解析会崩） */
+    private boolean unauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"code\":500,\"message\":\"" + message + "\",\"data\":null}");
+        return false;
     }
-
 }

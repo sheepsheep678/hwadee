@@ -1,68 +1,45 @@
 package com.cdut.dto;
 
-import com.cdut.entity.FamilyContact;
-import com.cdut.entity.HealthRecord;
+import com.cdut.pojo.ElderProfile;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.List;
 
-/**
- * 老人档案新增/修改入参
- */
 @Data
-public class ElderProfileSaveDTO implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class ElderProfileSaveDTO extends ElderProfile {
 
-    /** 姓名 */
-    @NotBlank(message = "姓名不能为空")
-    private String name;
+   @NotBlank(message = "姓名不能为空")
+   private String name;
 
-    /** 身份证号 */
-    @NotBlank(message = "身份证号不能为空")
-    private String idCard;
+   @NotNull(message = "性别不能为空")
+   private Integer gender;
 
-    /** 联系电话 */
-    private String phone;
+   @NotBlank(message = "身份证号不能为空")
+   @Pattern(regexp = "^d{17}[dXx]$", message = "身份证号格式错误")
+   private String idCard;
 
-    /** 性别：1-男 2-女 */
-    private Integer gender;
+   @NotBlank(message = "联系电话不能为空")
+   @Pattern(regexp = "^1[3-9]d{9}$", message = "手机号格式错误")
+   private String phone;
 
-    /** 出生日期 */
-    private LocalDate birthDate;
+   @NotNull(message = "居住方式不能为空")
+   private Integer livingType;
 
-    /** 年龄 */
-    private Integer age;
+   // 家属联系人列表 /
 
-    /** 居住类型：1-居家 2-社区 3-机构 4-独居 */
-    private Integer livingType;
+   private List<FamilyContactDTO> familyContacts;
 
-    /** 居住地址 */
-    private String address;
+   // 健康档案列表 /
 
-    /** 照片地址 */
-    private String photo;
-
-    /** 紧急联系人 */
-    private String emergencyContact;
-
-    /** 紧急联系电话 */
-    private String emergencyPhone;
-
-    /** 病史 */
-    private String medicalHistory;
-
-    /** 备注 */
-    private String remark;
-
-    /** 健康档案 */
-    private List<HealthRecord> healthRecords;
-
-    /** 家属联系人 */
-    private List<FamilyContact> familyContacts;
-
-    /** 标签ID列表 */
-    private List<Long> tagIds;
+   private List<HealthRecordDTO> healthRecords;
 
 }
