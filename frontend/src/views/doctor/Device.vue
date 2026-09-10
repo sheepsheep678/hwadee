@@ -116,7 +116,7 @@ loadData()
             v-model="queryForm.deviceType"
             placeholder="全部"
             clearable
-            style="width: 150px"
+            class="type-select"
           >
             <el-option label="智能床垫" :value="1" />
             <el-option label="手环" :value="2" />
@@ -131,7 +131,7 @@ loadData()
             v-model="queryForm.onlineStatus"
             placeholder="全部"
             clearable
-            style="width: 130px"
+            class="status-select"
           >
             <el-option label="在线" :value="1" />
             <el-option label="离线" :value="0" />
@@ -146,11 +146,11 @@ loadData()
       </el-form>
     </el-card>
 
-    <el-card shadow="never">
-      <el-table v-loading="loading" :data="tableData" style="width: 100%">
+    <el-card class="table-card" shadow="never">
+      <el-table v-loading="loading" :data="tableData" style="width: 100%" empty-text="暂无设备">
         <el-table-column prop="deviceSn" label="设备编号" width="150" />
 
-        <el-table-column prop="deviceName" label="设备名称" width="150" />
+        <el-table-column prop="deviceName" label="设备名称" width="150" show-overflow-tooltip />
 
         <el-table-column label="设备类型" width="120">
           <template #default="{ row }">
@@ -158,9 +158,9 @@ loadData()
           </template>
         </el-table-column>
 
-        <el-table-column prop="model" label="型号" width="120" />
+        <el-table-column prop="model" label="型号" width="120" show-overflow-tooltip />
 
-        <el-table-column prop="brand" label="品牌" width="120" />
+        <el-table-column prop="brand" label="品牌" width="120" show-overflow-tooltip />
 
         <el-table-column prop="elderName" label="绑定老人" width="120" />
 
@@ -203,7 +203,7 @@ loadData()
       </div>
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="设备详情" width="560px">
+    <el-dialog v-model="detailVisible" title="设备详情" width="560px" style="max-width: 92vw">
       <el-descriptions :column="2" border>
         <el-descriptions-item label="设备编号">
           {{ currentDevice.deviceSn }}
@@ -262,28 +262,167 @@ loadData()
   width: 100%;
 }
 
+/* ===== 页头 ===== */
 .page-header {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 22px 26px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(43, 127, 212, 0.08));
 }
 
 .page-header h2 {
+  position: relative;
   margin: 0;
-  color: #303133;
+  padding-left: 14px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f3b4d;
+}
+
+.page-header h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: #0f766e;
 }
 
 .page-header p {
   margin: 8px 0 0;
-  color: #909399;
   font-size: 14px;
+  color: #5b7b8a;
 }
 
+/* 主按钮统一医生端主色（仅本页 scoped 生效） */
+.device-page :deep(.el-button--primary) {
+  --el-button-bg-color: #0f766e;
+  --el-button-border-color: #0f766e;
+  --el-button-hover-bg-color: #0d6a63;
+  --el-button-hover-border-color: #0d6a63;
+  --el-button-active-bg-color: #0b5e58;
+  --el-button-active-border-color: #0b5e58;
+}
+
+/* ===== 查询区 ===== */
 .search-card {
   margin-bottom: 20px;
 }
 
+.search-card :deep(.el-form--inline .el-form-item) {
+  margin-right: 18px;
+  margin-bottom: 12px;
+}
+
+.search-card :deep(.el-input__wrapper),
+.search-card :deep(.el-select__wrapper) {
+  border-radius: 10px;
+}
+
+.type-select {
+  width: 150px;
+}
+
+.status-select {
+  width: 130px;
+}
+
+/* ===== 表格 ===== */
+.table-card {
+  margin-bottom: 20px;
+}
+
+.device-page :deep(.el-table) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.device-page :deep(.el-table th.el-table__cell) {
+  background: rgba(15, 118, 110, 0.06);
+  color: #1f3b4d;
+  font-weight: 600;
+}
+
+.device-page :deep(.el-table td.el-table__cell) {
+  padding: 12px 0;
+}
+
+.device-page :deep(.el-table__body tr:hover > td.el-table__cell) {
+  background: rgba(15, 118, 110, 0.045);
+}
+
+.device-page :deep(.el-table .el-button.is-link) {
+  font-size: 13px;
+}
+
+/* 电量进度条统一医生端主色 */
+.device-page :deep(.el-progress-bar__inner) {
+  background-color: #0f766e;
+}
+
+.device-page :deep(.el-progress-bar__outer) {
+  background-color: rgba(15, 118, 110, 0.12);
+}
+
+/* ===== 分页 ===== */
 .pagination {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 16px;
+}
+
+.device-page :deep(.el-pagination.is-background .el-pager li.is-active) {
+  background-color: #0f766e;
+}
+
+/* ===== 详情弹窗 ===== */
+.device-page :deep(.el-descriptions__label.el-descriptions__cell.is-bordered-label) {
+  background: rgba(15, 118, 110, 0.05);
+  color: #35566a;
+  font-weight: 500;
+}
+
+.device-page :deep(.el-descriptions__content.el-descriptions__cell.is-bordered-content) {
+  color: #1f3b4d;
+}
+
+/* ===== 响应式：小于 900px ===== */
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .search-card :deep(.el-form--inline .el-form-item) {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .search-card :deep(.el-form--inline .el-form-item .el-form-item__content) {
+    width: 100%;
+  }
+
+  .search-card :deep(.el-input),
+  .search-card :deep(.el-select) {
+    width: 100%;
+  }
+
+  .type-select,
+  .status-select {
+    width: 100%;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
 }
 </style>

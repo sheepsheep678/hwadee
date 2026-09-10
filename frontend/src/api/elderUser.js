@@ -102,3 +102,20 @@ export function getUnreadMessageCount() {
     method: 'get',
   })
 }
+
+// 获取我的评估报告（分页，当前登录老人由后端 JWT 识别，不传 elderId）
+export function getMyAssessmentReports(params) {
+  return request({
+    url: '/elder/center/assessment-reports',
+    method: 'get',
+    params,
+  })
+}
+
+// 获取我的评估报告详情
+export function getMyAssessmentReportDetail(id) {
+  return request({
+    url: `/elder/center/assessment-reports/${id}`,
+    method: 'get',
+  })
+}

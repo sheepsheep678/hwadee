@@ -9,6 +9,8 @@ import {
   readElderMessage,
   markAllElderMessagesRead,
   getUnreadMessageCount,
+  getMyAssessmentReports,
+  getMyAssessmentReportDetail,
 } from '@/api/elderUser'
 
 const activeTab = ref('account')
@@ -37,6 +39,16 @@ const passwordForm = reactive({
 const messages = ref([])
 const unreadCount = ref(0)
 const messagesLoading = ref(false)
+
+const reports = ref([])
+const reportTotal = ref(0)
+const reportLoading = ref(false)
+const reportPageNum = ref(1)
+const reportPageSize = ref(10)
+const reportAssessType = ref(null)
+const detailVisible = ref(false)
+const detailLoading = ref(false)
+const currentReport = ref({})
 
 const authStatusText = (status) => {
   const map = {
@@ -76,6 +88,17 @@ const messageTypeText = (type) => {
   }
 
   return map[type] || '其他'
+}
+
+const assessTypeText = (type) => {
+  const map = {
+    1: '老年能力',
+    2: '健康风险',
+    3: '中医体质',
+    4: '膳食营养',
+  }
+
+  return map[type] || '-'
 }
 
 const loadAccount = async () => {
@@ -181,9 +204,59 @@ const handleReadAll = async () => {
   }
 }
 
+const loadReports = async () => {
+  reportLoading.value = true
+
+  try {
+    const params = {
+      pageNum: reportPageNum.value,
+      pageSize: reportPageSize.value,
+    }
+
+    if (reportAssessType.value !== null && reportAssessType.value !== '') {
+      params.assessType = reportAssessType.value
+    }
+
+    const result = await getMyAssessmentReports(params)
+
+    reports.value = result.data?.list || []
+    reportTotal.value = result.data?.total || 0
+  } catch (error) {
+    console.error('获取评估报告失败：', error)
+  } finally {
+    reportLoading.value = false
+  }
+}
+
+const handleReportTypeChange = () => {
+  reportPageNum.value = 1
+  loadReports()
+}
+
+const handleReportPageChange = (page) => {
+  reportPageNum.value = page
+  loadReports()
+}
+
+const handleReportDetail = async (row) => {
+  detailVisible.value = true
+  detailLoading.value = true
+  currentReport.value = {}
+
+  try {
+    const result = await getMyAssessmentReportDetail(row.id)
+    currentReport.value = result.data || {}
+  } catch (error) {
+    console.error('获取评估报告详情失败：', error)
+  } finally {
+    detailLoading.value = false
+  }
+}
+
 loadAccount()
 loadMessages()
 loadUnreadCount()
+loadReports()
 </script>
 
 <template>
@@ -308,7 +381,101 @@ loadUnreadCount()
           </div>
         </el-card>
       </el-tab-pane>
+
+      <!-- 评估报告 -->
+      <el-tab-pane label="评估报告" name="assessment">
+        <el-card shadow="never">
+          <div class="report-toolbar">
+            <el-select
+              v-model="reportAssessType"
+              placeholder="全部类型"
+              clearable
+              style="width: 180px"
+              @change="handleReportTypeChange"
+            >
+              <el-option label="老年能力" :value="1" />
+              <el-option label="健康风险" :value="2" />
+              <el-option label="中医体质" :value="3" />
+              <el-option label="膳食营养" :value="4" />
+            </el-select>
+
+            <el-button @click="loadReports"> 刷新 </el-button>
+          </div>
+
+          <el-table v-loading="reportLoading" :data="reports" style="width: 100%">
+            <el-table-column prop="reportNo" label="报告编号" width="200" />
+
+            <el-table-column label="评估类型" width="120">
+              <template #default="{ row }">
+                {{ assessTypeText(row.assessType) }}
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="score" label="得分" width="100" />
+
+            <el-table-column label="等级" width="120">
+              <template #default="{ row }">
+                <el-tag type="warning">{{ row.grade }}</el-tag>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="assessDate" label="评估日期" width="130" />
+
+            <el-table-column prop="conclusion" label="结论" min-width="200" show-overflow-tooltip />
+
+            <el-table-column label="操作" width="100" fixed="right">
+              <template #default="{ row }">
+                <el-button link type="primary" @click="handleReportDetail(row)"> 查看 </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <el-empty v-if="!reportLoading && reports.length === 0" description="暂无评估报告" />
+
+          <div class="pagination">
+            <el-pagination
+              v-model:current-page="reportPageNum"
+              v-model:page-size="reportPageSize"
+              background
+              layout="total, prev, pager, next"
+              :total="reportTotal"
+              @current-change="handleReportPageChange"
+            />
+          </div>
+        </el-card>
+      </el-tab-pane>
     </el-tabs>
+
+    <!-- 评估报告详情 -->
+    <el-dialog v-model="detailVisible" title="评估报告详情" width="620px">
+      <div v-loading="detailLoading">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="报告编号">
+            {{ currentReport.reportNo || '-' }}
+          </el-descriptions-item>
+
+          <el-descriptions-item label="评估类型">
+            {{ assessTypeText(currentReport.assessType) }}
+          </el-descriptions-item>
+
+          <el-descriptions-item label="得分">
+            {{ currentReport.score ?? '-' }}
+          </el-descriptions-item>
+
+          <el-descriptions-item label="等级">
+            {{ currentReport.grade || '-' }}
+          </el-descriptions-item>
+
+          <el-descriptions-item label="评估日期">
+            {{ currentReport.assessDate || '-' }}
+          </el-descriptions-item>
+
+          <el-descriptions-item label="评估结论" :span="2">
+            {{ currentReport.conclusion || '-' }}
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -390,5 +557,17 @@ loadUnreadCount()
 .unread-tip {
   color: #e6a23c;
   font-size: 12px;
+}
+
+.report-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.pagination {
+  margin-top: 16px;
+  text-align: right;
 }
 </style>

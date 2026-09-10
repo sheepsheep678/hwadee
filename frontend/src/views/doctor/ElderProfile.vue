@@ -260,7 +260,7 @@ loadData()
             v-model="queryForm.livingType"
             placeholder="全部"
             clearable
-            style="width: 130px"
+            class="living-select"
           >
             <el-option label="居家" :value="1" />
             <el-option label="社区" :value="2" />
@@ -279,7 +279,7 @@ loadData()
 
     <!-- 表格 -->
     <el-card class="table-card" shadow="never">
-      <el-table v-loading="loading" :data="tableData" style="width: 100%">
+      <el-table v-loading="loading" :data="tableData" style="width: 100%" empty-text="暂无记录">
         <el-table-column prop="elderNo" label="老人编号" width="150" />
 
         <el-table-column prop="name" label="姓名" width="100" />
@@ -300,7 +300,7 @@ loadData()
           </template>
         </el-table-column>
 
-        <el-table-column prop="address" label="居住地址" min-width="180" />
+        <el-table-column prop="address" label="居住地址" min-width="180" show-overflow-tooltip />
 
         <el-table-column label="状态" width="90">
           <template #default="{ row }">
@@ -334,7 +334,12 @@ loadData()
     </el-card>
 
     <!-- 新增 / 编辑 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="650px">
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="650px"
+      style="max-width: 92vw"
+    >
       <el-form :model="form" label-width="90px">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -408,7 +413,7 @@ loadData()
     </el-dialog>
 
     <!-- 详情 -->
-    <el-dialog v-model="detailVisible" title="老人档案详情" width="760px">
+    <el-dialog v-model="detailVisible" title="老人档案详情" width="760px" style="max-width: 92vw">
       <el-descriptions :column="3" border>
         <el-descriptions-item label="老人编号">
           {{ currentDetail.elderNo }}
@@ -461,7 +466,11 @@ loadData()
 
       <div class="sub-title">健康档案</div>
 
-      <el-table :data="currentDetail.healthRecords || []" style="width: 100%">
+      <el-table
+        :data="currentDetail.healthRecords || []"
+        style="width: 100%"
+        empty-text="暂无记录"
+      >
         <el-table-column label="记录类型" width="100">
           <template #default="{ row }">
             {{ recordTypeText(row.recordType) }}
@@ -470,7 +479,7 @@ loadData()
 
         <el-table-column prop="diseaseName" label="疾病 / 事项" width="140" />
 
-        <el-table-column prop="hospital" label="就诊医院" min-width="160" />
+        <el-table-column prop="hospital" label="就诊医院" min-width="160" show-overflow-tooltip />
 
         <el-table-column prop="diagnoseDate" label="确诊日期" width="110" />
 
@@ -479,7 +488,11 @@ loadData()
 
       <div class="sub-title">家属联系人</div>
 
-      <el-table :data="currentDetail.familyContacts || []" style="width: 100%">
+      <el-table
+        :data="currentDetail.familyContacts || []"
+        style="width: 100%"
+        empty-text="暂无记录"
+      >
         <el-table-column prop="name" label="姓名" width="110" />
 
         <el-table-column prop="relation" label="关系" width="110" />
@@ -505,22 +518,44 @@ loadData()
   width: 100%;
 }
 
+/* ===== 页头 ===== */
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 22px 26px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(43, 127, 212, 0.08));
 }
 
 .page-header h2 {
+  position: relative;
   margin: 0;
-  color: #303133;
+  padding-left: 14px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f3b4d;
+}
+
+.page-header h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: #0f766e;
 }
 
 .page-header p {
   margin: 8px 0 0;
-  color: #909399;
   font-size: 14px;
+  color: #5b7b8a;
 }
 
 .header-actions {
@@ -528,28 +563,147 @@ loadData()
   gap: 12px;
 }
 
+/* 主按钮统一医生端主色（仅本页 scoped 生效） */
+.profile-page :deep(.el-button--primary) {
+  --el-button-bg-color: #0f766e;
+  --el-button-border-color: #0f766e;
+  --el-button-hover-bg-color: #0d6a63;
+  --el-button-hover-border-color: #0d6a63;
+  --el-button-active-bg-color: #0b5e58;
+  --el-button-active-border-color: #0b5e58;
+}
+
+/* ===== 查询区 ===== */
 .search-card {
   margin-bottom: 20px;
 }
 
+.search-card :deep(.el-form--inline .el-form-item) {
+  margin-right: 18px;
+  margin-bottom: 12px;
+}
+
+.search-card :deep(.el-input__wrapper),
+.search-card :deep(.el-select__wrapper) {
+  border-radius: 10px;
+}
+
+.living-select {
+  width: 130px;
+}
+
+/* ===== 表格 ===== */
 .table-card {
   margin-bottom: 20px;
+}
+
+.profile-page :deep(.el-table) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.profile-page :deep(.el-table th.el-table__cell) {
+  background: rgba(15, 118, 110, 0.06);
+  color: #1f3b4d;
+  font-weight: 600;
+}
+
+.profile-page :deep(.el-table td.el-table__cell) {
+  padding: 12px 0;
+}
+
+.profile-page :deep(.el-table__body tr:hover > td.el-table__cell) {
+  background: rgba(15, 118, 110, 0.045);
+}
+
+.profile-page :deep(.el-table .el-button.is-link) {
+  font-size: 13px;
+}
+
+.profile-page :deep(.el-table .el-button.is-link + .el-button.is-link) {
+  margin-left: 12px;
 }
 
 .pagination {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
+.profile-page :deep(.el-pagination.is-background .el-pager li.is-active) {
+  background-color: #0f766e;
+}
+
+/* ===== 详情弹窗 ===== */
 .sub-title {
-  margin: 20px 0 10px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #303133;
+  position: relative;
+  margin: 22px 0 12px;
+  padding-left: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f3b4d;
+}
+
+.sub-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+  background: #0f766e;
+}
+
+.profile-page :deep(.el-descriptions__label.el-descriptions__cell.is-bordered-label) {
+  background: rgba(15, 118, 110, 0.05);
+  color: #35566a;
+  font-weight: 500;
+}
+
+.profile-page :deep(.el-descriptions__content.el-descriptions__cell.is-bordered-content) {
+  color: #1f3b4d;
 }
 
 .tag-item {
   margin-right: 8px;
+  margin-bottom: 4px;
+}
+
+/* ===== 响应式：小于 900px ===== */
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-card :deep(.el-form--inline .el-form-item) {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .search-card :deep(.el-form--inline .el-form-item .el-form-item__content) {
+    width: 100%;
+  }
+
+  .search-card :deep(.el-input),
+  .search-card :deep(.el-select) {
+    width: 100%;
+  }
+
+  .living-select {
+    width: 100%;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
 }
 </style>

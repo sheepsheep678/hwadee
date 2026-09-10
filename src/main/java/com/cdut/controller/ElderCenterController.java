@@ -1,6 +1,7 @@
 package com.cdut.controller;
 
 import com.cdut.dto.ElderAccountVO;
+import com.cdut.dto.ElderAssessmentReportVO;
 import com.cdut.dto.MessageQueryDTO;
 import com.cdut.dto.PasswordChangeDTO;
 import com.cdut.pojo.PageResult;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -68,5 +70,21 @@ public class ElderCenterController {
     public Result<Void> markAllRead() {
         elderCenterService.markAllRead(UserContext.getUserId());
         return Result.success("全部已读", null);
+    }
+
+    /** 我的评估报告（分页） */
+    @GetMapping("/assessment-reports")
+    public Result<PageResult<ElderAssessmentReportVO>> assessmentReports(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) Integer assessType) {
+        return Result.success(elderCenterService.listAssessmentReports(
+                UserContext.getUserId(), pageNum, pageSize, assessType));
+    }
+
+    /** 我的评估报告详情 */
+    @GetMapping("/assessment-reports/{id}")
+    public Result<ElderAssessmentReportVO> assessmentReportDetail(@PathVariable Long id) {
+        return Result.success(elderCenterService.getAssessmentReportDetail(UserContext.getUserId(), id));
     }
 }

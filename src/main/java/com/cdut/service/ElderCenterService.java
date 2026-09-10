@@ -1,6 +1,7 @@
 package com.cdut.service;
 
 import com.cdut.dto.ElderAccountVO;
+import com.cdut.dto.ElderAssessmentReportVO;
 import com.cdut.dto.MessageQueryDTO;
 import com.cdut.dto.PasswordChangeDTO;
 import com.cdut.pojo.PageResult;
@@ -28,4 +29,11 @@ public interface ElderCenterService {
 
     /** 全部消息标记已读（幂等：没有未读也返回成功） */
     void markAllRead(Long accountId);
+
+    /** 我的评估报告（分页，仅查询当前登录老人的报告） */
+    PageResult<ElderAssessmentReportVO> listAssessmentReports(Long accountId, int pageNum, int pageSize,
+                                                              Integer assessType);
+
+    /** 我的评估报告详情（校验报告归属当前登录老人） */
+    ElderAssessmentReportVO getAssessmentReportDetail(Long accountId, Long reportId);
 }
